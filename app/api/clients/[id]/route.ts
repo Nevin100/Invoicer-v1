@@ -1,14 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/database/db_connection";
 import { Client } from "@/lib/models/Clients.model";
 import jwt from "jsonwebtoken";
 
+type Params = {
+  params: {
+    id: string;
+  };
+};
+
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } } // Type for params is already set correctly here
+  req: NextRequest,
+  context: Params
 ) {
-  const JWT_SECRET = process.env.JWT_SECRET as string;
+  const JWT_SECRET = process.env.JWT_SECRET!;
   await connectDB();
 
   const authHeader = req.headers.get("authorization");
@@ -21,15 +27,12 @@ export async function GET(
   try {
     const decoded: any = jwt.verify(token, JWT_SECRET);
     const userId = decoded.userId;
-    const clientId = params.id; // Ensure that params is correctly destructured and typed
+    const clientId = context.params.id;
 
     const client = await Client.findOne({ _id: clientId, user: userId });
 
     if (!client) {
-      return NextResponse.json(
-        { error: "Client not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Client not found" }, { status: 404 });
     }
 
     return NextResponse.json(client, { status: 200 });
