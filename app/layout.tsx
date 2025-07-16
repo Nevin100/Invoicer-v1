@@ -8,17 +8,16 @@ import AuthGuard from "@/components/AuthGuard";
 import { useEffect } from "react";
 import Head from "next/head";
 
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   useEffect(() => {
-    document.title = "Instant Paid"
+    document.title = "Instant Paid";
   }, []);
 
   return (
-    <Provider store={store}>
-      <html lang="en">
+    <html lang="en">
+      <Provider store={store}>
         <Head>
           <meta charSet="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -31,7 +30,7 @@ export default function RootLayout({
             <AuthGuard>{children}</AuthGuard>
           </ClientLayout>
         </body>
-      </html>
-    </Provider>
+      </Provider>
+    </html>
   );
 }

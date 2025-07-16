@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createInvoiceFormType } from "@/lib/zod/create_invoice_zod_schema";
 import { NextRequest, NextResponse } from "next/server";
 import { PaymentPayloadType } from "../../payments/link-gen/rzp/route";

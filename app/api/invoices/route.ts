@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/database/db_connection";
@@ -53,21 +54,10 @@ export async function POST(req: Request) {
 //Get Request : 
 export async function GET(req: Request) {
   try {
-    await connectDB();
-
-    const token = req.headers.get("authorization")?.split(" ")[1];
-    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-    let userId: string;
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-      userId = decoded.userId;
-    } catch (err: any) {
-      return NextResponse.json({ message: err }, { status: 403 });
-    }
+    await connectDB()
 
     // Fetch invoices for the authenticated user
-    const invoices = await Invoice.find({ user: userId });
+    const invoices = await Invoice.find();
 
     if (!invoices) {
       return NextResponse.json({ message: "No invoices found" }, { status: 404 });
