@@ -1,14 +1,23 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 "use client";
 
 import { useState, useEffect } from "react";
-import PaymentRequests from "@/components/dashboard/PayementRequests";
-import RecentExpenses from "@/components/dashboard/RecentExpenses";
-import FinancialAnalytics from "@/components/dashboard/FinancialAnalytics";
-import NewCustomer from "@/components/dashboard/NewCustomer";
-import ExpensesChart from "@/components/dashboard/ExpensesChart";
-import FinancialMetrics from "@/components/dashboard/FinancialMetrics";
-import { Select, SelectTrigger, SelectValue, SelectItem, SelectGroup, SelectContent, SelectLabel } from "@/components/ui/select";
+import PaymentRequests from "@/components/Dashboard/PayementRequests";
+import RecentExpenses from "@/components/Dashboard/RecentExpenses";
+import FinancialAnalytics from "@/components/Dashboard/FinancialAnalytics";
+import NewCustomer from "@/components/Dashboard/NewCustomer";
+import ExpensesChart from "@/components/Dashboard/ExpensesChart";
+import FinancialMetrics from "@/components/Dashboard/FinancialMetrics";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectItem,
+  SelectGroup,
+  SelectContent,
+  SelectLabel,
+} from "@/components/ui/select";
 import { Archivo } from "next/font/google";
 
 const archivo = Archivo({
@@ -32,8 +41,12 @@ const Dashboard = () => {
   return (
     <div>
       {/* ✅ Financial Analytics Header */}
-      <div className={`${archivo.className} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
-        <h1 className="md:text-3xl text-2xl text-gray-800 md:py-1">Financial Analytics</h1>
+      <div
+        className={`${archivo.className} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}
+      >
+        <h1 className="md:text-3xl text-2xl text-gray-800 md:py-1">
+          Financial Analytics
+        </h1>
         <Select>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Quarterly" />
@@ -41,9 +54,15 @@ const Dashboard = () => {
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Frequency</SelectLabel>
-              <SelectItem value={frquencyValues.Monthly}>{frquencyValues.Monthly}</SelectItem>
-              <SelectItem value={frquencyValues.Quarterly}>{frquencyValues.Quarterly}</SelectItem>
-              <SelectItem value={frquencyValues.Yearly}>{frquencyValues.Yearly}</SelectItem>
+              <SelectItem value={frquencyValues.Monthly}>
+                {frquencyValues.Monthly}
+              </SelectItem>
+              <SelectItem value={frquencyValues.Quarterly}>
+                {frquencyValues.Quarterly}
+              </SelectItem>
+              <SelectItem value={frquencyValues.Yearly}>
+                {frquencyValues.Yearly}
+              </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -61,7 +80,9 @@ const Dashboard = () => {
 
       {/* ✅ Your Overview Section */}
       <div className="mt-[22px]">
-        <h2 className="md:text-3xl text-2xl text-gray-800 font-medium md:py-1">Your Overview</h2>
+        <h2 className="md:text-3xl text-2xl text-gray-800 font-medium md:py-1">
+          Your Overview
+        </h2>
       </div>
 
       {/* ✅ Payment Requests, Recent Expenses, New Customers & Expenses Chart */}

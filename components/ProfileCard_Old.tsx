@@ -1,6 +1,6 @@
 // app/components/ProfileCard.tsx
 
-import EmailHoverCardDemo from "./Profile/profile-hover-card";
+// import EmailHoverCardDemo from "./Profile/profile-hover-card";
 
 interface ProfileCardProps {
   name: string;
@@ -38,21 +38,11 @@ const ProfileCard = ({ name, email, phone }: ProfileCardProps) => {
         </div>
         <div className="text-gray-600">
           Phone No -{" "}
-          <a
-            href={`tel:${phone}`}
-            className="hover:underline"
-          >
+          <a href={`tel:${phone}`} className="hover:underline">
             {phone}
           </a>
         </div>
       </div>
-
-
-
-
-
-
-
     </div>
   );
 };

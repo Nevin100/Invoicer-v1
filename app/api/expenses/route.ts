@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 //api/expenses/route.ts
 
@@ -100,19 +101,6 @@ export async function GET(req: NextRequest) {
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // 👇 DELETE handler for deleting expenses
 export async function DELETE(req: NextRequest) {

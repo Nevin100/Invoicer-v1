@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,8 +12,8 @@ import { useSearchParams } from "next/navigation";
 import ProfileCard from "@/components/ProfileCard"; // Import ProfileCard
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import HeaderInfoCard from "@/components/Profile/header-info-card";
-import HeaderStats from "@/components/Profile/header-stats";
+import HeaderInfoCard from "@/components/profile/header-info-card";
+import HeaderStats from "@/components/profile/header-stats";
 
 interface Client {
   _id: string;
@@ -79,7 +80,7 @@ const ClientPage = () => {
     const today = new Date();
     const lastNDays = new Date(today.setDate(today.getDate() - days));
 
-    const recentClients = clients.filter(client => {
+    const recentClients = clients.filter((client) => {
       const clientDate = new Date(client.createdAt);
       return clientDate >= lastNDays;
     });
@@ -87,7 +88,6 @@ const ClientPage = () => {
     setFilteredClients(recentClients);
     setCurrentPage(1);
   };
-
 
   const searchClients = () => {
     const query = searchQuery.toLowerCase();
@@ -155,8 +155,14 @@ const ClientPage = () => {
       } as any);
 
       console.log(res);
-      setClients(clients.filter((client) => !selectedClients.includes(client._id)));
-      setFilteredClients(filteredClients.filter((client) => !selectedClients.includes(client._id)));
+      setClients(
+        clients.filter((client) => !selectedClients.includes(client._id))
+      );
+      setFilteredClients(
+        filteredClients.filter(
+          (client) => !selectedClients.includes(client._id)
+        )
+      );
       setSelectedClients([]);
 
       Swal.fire({
@@ -172,11 +178,10 @@ const ClientPage = () => {
         text: err?.response?.data?.error,
         icon: "error",
       });
-
     }
   };
 
-  //handle Export : 
+  //handle Export :
   const handleExport = () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Clients");
@@ -192,9 +197,10 @@ const ClientPage = () => {
       { header: "Due Date", key: "dueDate" },
     ];
 
-    const filteredData = selectedClients.length > 0
-      ? clients.filter((client) => selectedClients.includes(client._id))
-      : searchClients();
+    const filteredData =
+      selectedClients.length > 0
+        ? clients.filter((client) => selectedClients.includes(client._id))
+        : searchClients();
 
     filteredData.forEach((client) => {
       worksheet.addRow({
@@ -215,8 +221,7 @@ const ClientPage = () => {
     });
   };
 
-
-  //render Pagination : 
+  //render Pagination :
   const renderPagination = () => (
     <div className="flex justify-center items-center mt-6 gap-2">
       <button
@@ -245,11 +250,9 @@ const ClientPage = () => {
     </div>
   );
 
-  //Main block : 
+  //Main block :
   return (
     <div className=" font-['Archivo'] p-4 sm:p-6 bg-white">
-
-
       {/* Individual Client Details */}
       <section className="flex flex-col items-center min-[1280px]:flex-row min-[1280px]:justify-between mb-6 font-['Archivo'] text-[17px]">
         {client && (
@@ -260,13 +263,9 @@ const ClientPage = () => {
           />
         )}
 
-
-
         <div className=" grid grid-cols-1 lg:grid-cols-2 gap-4">
-
           <Card className="flex justify-center w-[273px] h-[106px] bg-[#FCFDFF]">
             <CardContent className="flex justify-between">
-
               <HeaderInfoCard mainText={"Total Invoices"} count={`40`} />
 
               <HeaderStats
@@ -274,13 +273,11 @@ const ClientPage = () => {
                 isIncreased={true}
                 bottomText={"from last month"}
               />
-
             </CardContent>
           </Card>
 
           <Card className="flex justify-center w-[273px] h-[106px] bg-[#FCFDFF]">
             <CardContent className="flex justify-between">
-
               <HeaderInfoCard mainText={"Total Payment"} count={`$1200`} />
 
               <HeaderStats
@@ -288,33 +285,25 @@ const ClientPage = () => {
                 isIncreased={true}
                 bottomText={"from last month"}
               />
-
             </CardContent>
           </Card>
 
           <Card className="flex justify-center w-[273px] h-[106px] bg-[#FCFDFF]">
             <CardContent className="flex justify-between">
-
               <HeaderInfoCard mainText={"Outstanding Invoices"} count={`2`} />
-
             </CardContent>
           </Card>
 
           <Card className="flex justify-center w-[273px] h-[106px] bg-[#FCFDFF]">
             <CardContent className="flex justify-between">
-
-              <HeaderInfoCard mainText={"Outstanding Payment"} count={`$1200`} />
-
-
+              <HeaderInfoCard
+                mainText={"Outstanding Payment"}
+                count={`$1200`}
+              />
             </CardContent>
           </Card>
-
         </div>
-
-
       </section>
-
-
       {/* Search + Buttons */}
       <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <input
@@ -328,7 +317,10 @@ const ClientPage = () => {
           className="w-full sm:w-1/3 border px-4 py-2 rounded-md text-sm"
         />
         <div className="flex flex-wrap justify-end gap-2">
-          <Button onClick={handleExport} className="border px-5 py-2 rounded-md text-white flex items-center text-sm cursor-pointer hover:bg-gray-800">
+          <Button
+            onClick={handleExport}
+            className="border px-5 py-2 rounded-md text-white flex items-center text-sm cursor-pointer hover:bg-gray-800"
+          >
             <FaDownload className="mr-2" /> Export
           </Button>
           <select
@@ -346,19 +338,29 @@ const ClientPage = () => {
             <option value={365}>Last 365 days</option>
           </select>
 
-          <button onClick={handleDelete} className="border px-5 py-2 rounded-md text-red-500 flex items-center text-sm cursor-pointer hover:bg-red-500 hover:text-white">
+          <button
+            onClick={handleDelete}
+            className="border px-5 py-2 rounded-md text-red-500 flex items-center text-sm cursor-pointer hover:bg-red-500 hover:text-white"
+          >
             Delete Selected
           </button>
         </div>
       </section>
-
       {/* Desktop Table */}
       <div className="hidden min-[1040px]:block border rounded-lg min-h-[450px]">
         <table className="w-full text-sm text-left">
           <thead className="bg-white border-b text-gray-600 font-medium">
             <tr>
               <th className="p-3">
-                <input type="checkbox" checked={paginatedClients().length > 0 && selectedClients.length === paginatedClients().length} onChange={toggleSelectAll} className="accent-purple-600" />
+                <input
+                  type="checkbox"
+                  checked={
+                    paginatedClients().length > 0 &&
+                    selectedClients.length === paginatedClients().length
+                  }
+                  onChange={toggleSelectAll}
+                  className="accent-purple-600"
+                />
               </th>
               <th className="p-3">Charge</th>
               <th className="p-3">Status</th>
@@ -370,52 +372,85 @@ const ClientPage = () => {
           </thead>
           <tbody>
             {paginatedClients().map((client) => (
-              <tr key={client._id}
-                className="border-t cursor-pointer hover:bg-gray-100" onClick={() => router.push(`/clients/profile?id=${client._id}`)}>
+              <tr
+                key={client._id}
+                className="border-t cursor-pointer hover:bg-gray-100"
+                onClick={() => router.push(`/clients/profile?id=${client._id}`)}
+              >
                 <td className="p-3">
-                  <input type="checkbox" checked={selectedClients.includes(client._id)} onChange={() => toggleSelectClient(client._id)} className="accent-purple-600" />
+                  <input
+                    type="checkbox"
+                    checked={selectedClients.includes(client._id)}
+                    onChange={() => toggleSelectClient(client._id)}
+                    className="accent-purple-600"
+                  />
                 </td>
-                <td className="p-3 font-bold text-black">${client.serviceCharge}</td>
-                <td className="p-3">
-                  <span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded-full">Paid</span>
+                <td className="p-3 font-bold text-black">
+                  ${client.serviceCharge}
                 </td>
                 <td className="p-3">
-                  <div className="font-medium text-gray-800">{client.clientName}</div>
+                  <span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded-full">
+                    Paid
+                  </span>
+                </td>
+                <td className="p-3">
+                  <div className="font-medium text-gray-800">
+                    {client.clientName}
+                  </div>
                   <div className="text-xs text-gray-500">{client.email}</div>
                   <div className="text-xs text-gray-500">{client.mobile}</div>
                 </td>
                 <td className="p-3 text-gray-700">{client.companyName}</td>
-                <td className="p-3">{new Date(client.createdAt).toLocaleString()}</td>
-                <td className="p-3">{new Date(client.createdAt).toLocaleDateString()}</td>
+                <td className="p-3">
+                  {new Date(client.createdAt).toLocaleString()}
+                </td>
+                <td className="p-3">
+                  {new Date(client.createdAt).toLocaleDateString()}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
       {/* Mobile View */}
       <div className="min-[1040px]:hidden flex flex-col gap-4">
         {paginatedClients().map((client, i) => (
-          <div key={i} className="border rounded-lg p-4 shadow-sm relative cursor-pointer" onClick={() => router.push(`/clients/profile?id=${client._id}`)}>
-            <input type="checkbox" checked={selectedClients.includes(client._id)} onChange={() => toggleSelectClient(client._id)} className="absolute bottom-2 right-2 h-4 w-4 accent-purple-600" />
+          <div
+            key={i}
+            className="border rounded-lg p-4 shadow-sm relative cursor-pointer"
+            onClick={() => router.push(`/clients/profile?id=${client._id}`)}
+          >
+            <input
+              type="checkbox"
+              checked={selectedClients.includes(client._id)}
+              onChange={() => toggleSelectClient(client._id)}
+              className="absolute bottom-2 right-2 h-4 w-4 accent-purple-600"
+            />
             <div className="flex justify-between items-center mb-2 pr-6">
               <div className="font-bold text-lg">${client.serviceCharge}</div>
-              <span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded-full">Paid</span>
+              <span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded-full">
+                Paid
+              </span>
             </div>
             <div className="text-sm font-medium">{client.clientName}</div>
             <div className="text-xs text-gray-500">{client.email}</div>
             <div className="text-xs text-gray-500 mb-2">{client.mobile}</div>
-            <div className="text-sm mb-1"><span className="font-semibold">Issue:</span> {new Date(client.createdAt).toLocaleString()}</div>
-            <div className="text-sm mb-1"><span className="font-semibold">Due:</span> {new Date(client.createdAt).toLocaleDateString()}</div>
+            <div className="text-sm mb-1">
+              <span className="font-semibold">Issue:</span>{" "}
+              {new Date(client.createdAt).toLocaleString()}
+            </div>
+            <div className="text-sm mb-1">
+              <span className="font-semibold">Due:</span>{" "}
+              {new Date(client.createdAt).toLocaleDateString()}
+            </div>
             <div className="text-sm">{client.companyName}</div>
           </div>
         ))}
       </div>
-
-      <div className="mt-auto">{renderPagination()}</div> {/* Pagination component call */}
+      <div className="mt-auto">{renderPagination()}</div>{" "}
+      {/* Pagination component call */}
     </div>
   );
 };
 
 export default ClientPage;
-

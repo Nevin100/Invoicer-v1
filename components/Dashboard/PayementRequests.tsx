@@ -1,28 +1,58 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import PaymentRequestsLoading from "../Loading_ui/PaymentRequestsLoading";
+import PaymentRequestsLoading from "@/components/loading_ui/PaymentRequestsLoading";
+import Swal from "sweetalert2";
 
-const statusColors: Record<string, string> = {
-  Paid: "bg-green-100 text-green-600",
-  Overdue: "bg-red-100 text-red-600",
-  Pending: "bg-yellow-100 text-yellow-600",
-};
+interface Client {
+  _id: string;
+  clientName: string;
+  email: string;
+  companyName: string;
+  phone: string;
+  createdAt: string;
+}
 
 const PaymentRequests = () => {
-  const [payments, setPayments] = useState<{ email: string; status: string; amount: string; dueDate: string; }[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPayments = async () => {
+    const fetchClients = async () => {
       try {
-        const response = await fetch("/api/payment_requests"); // Replace with actual API URL
-        if (!response.ok) {
-          throw new Error("Failed to fetch payments");
+        const token = localStorage.getItem("token");
+        if (!token) {
+          Swal.fire({
+            icon: "error",
+            title: "Unauthorized",
+            text: "Please log in to view clients.",
+          });
+          setLoading(false);
+          return;
         }
-        const data = await response.json();
-        setPayments(data);
+
+        const res = await fetch("/api/clients", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || "Failed to fetch clients");
+        }
+
+        const data: Client[] = await res.json();
+        // Sort latest first & take only 5
+        const latestClients = data
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+          .slice(0, 5);
+
+        setClients(latestClients);
       } catch (error) {
         setError((error as Error).message);
       } finally {
@@ -30,46 +60,63 @@ const PaymentRequests = () => {
       }
     };
 
-    fetchPayments();
+    fetchClients();
   }, []);
 
   if (loading) return <PaymentRequestsLoading />;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (error)
+    return <p className="text-center text-red-500 font-medium">{error}</p>;
 
   return (
-    <div className="bg-white p-5 rounded-xl shadow-md mt-6 md:h-[34.3rem]">
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-black">Payment Requests</h2>
-        <select className="border px-3 py-1.5 rounded-lg text-black text-sm">
-          <option>All Status</option>
+    <div className="bg-white p-6 rounded-2xl shadow-md mt-6 md:h-full">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-5">
+        <h2 className="text-xl font-semibold text-gray-800">Clients</h2>
+        <select className="border border-gray-300 px-3 py-1.5 rounded-lg text-gray-700 text-sm focus:outline-none">
+          <option>All</option>
         </select>
       </div>
 
       {/* Table Header */}
-      <div className="flex justify-between pb-2 border-b text-gray-500 text-sm font-semibold">
-        <span>Key Detail</span>
-        <span className="w-24 ml-[9rem]">Date</span>
-        <span>Status</span>
+      <div className="grid grid-cols-3 pb-2 border-b text-gray-500 text-sm font-semibold">
+        <span>Details</span>
+        <span className="text-center">Date Added</span>
+        <span className="text-right">Company</span>
       </div>
 
-      {/* Payment List */}
-      <div className="w-full">
-        {payments.length > 0 ? (
-          payments.map((payment, index) => (
-            <div key={index} className="flex justify-between items-center border-b py-4 last:border-none md:gap-0 gap-3">
+      {/* Client List */}
+      <div className="divide-y">
+        {clients.length > 0 ? (
+          clients.map((client) => (
+            <div
+              key={client._id}
+              className="grid grid-cols-3 items-center py-4 hover:bg-gray-50 transition-all"
+            >
+              {/* Client Name & Email */}
               <div>
-                <p className="text-sm font-bold">{payment.amount}</p>
-                <p className="text-gray-500 text-sm">{payment.email}</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {client.clientName}
+                </p>
+                <p className="text-xs text-gray-500">{client.email}</p>
               </div>
-              <p className="text-gray-600 text-sm text-center w-24">{payment.dueDate}</p>
-              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColors[payment.status] || "bg-gray-100 text-gray-600"}`}>
-                {payment.status}
+
+              {/* Date */}
+              <p className="text-gray-600 text-sm text-center">
+                {new Date(client.createdAt).toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </p>
+
+              {/* Company */}
+              <span className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-right justify-self-end">
+                {client.companyName || "Freelance"}
               </span>
             </div>
           ))
         ) : (
-          <p className="text-center text-gray-500">No payments found.</p>
+          <p className="text-center text-gray-500 py-10">No clients found.</p>
         )}
       </div>
     </div>
