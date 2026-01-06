@@ -1,5 +1,4 @@
 import { IoIosArrowRoundUp } from "react-icons/io";
-import { Archivo } from 'next/font/google';
 
 type Proptype = {
     title: string;

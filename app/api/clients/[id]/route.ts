@@ -5,15 +5,14 @@ import { Client } from "@/lib/models/Clients.model";
 import jwt from "jsonwebtoken";
 
 type Params = {
-  params: {
-    id: string;
-  };
+  id: string
 };
 
 export async function GET(
-  req: NextRequest,
-  context: Params
+ req: NextRequest,
+  { params }: { params: Promise<Params> }
 ) {
+  const { id } = await params;
   const JWT_SECRET = process.env.JWT_SECRET!;
   await connectDB();
 
@@ -27,7 +26,7 @@ export async function GET(
   try {
     const decoded: any = jwt.verify(token, JWT_SECRET);
     const userId = decoded.userId;
-    const clientId = context.params.id;
+    const clientId = id;
 
     const client = await Client.findOne({ _id: clientId, user: userId });
 

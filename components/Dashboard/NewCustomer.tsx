@@ -9,6 +9,11 @@ type ChartPoint = {
   value: number;
 };
 
+type ClientStatsResponse = {
+  chartData: ChartPoint[];
+  totalClients: number;
+};
+
 const NewCustomer = () => {
   const [data, setData] = useState<ChartPoint[]>([]);
   const [total, setTotal] = useState(0);
@@ -16,7 +21,7 @@ const NewCustomer = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    axios.get("/api/clients/stats", {
+    axios.get<ClientStatsResponse>("/api/clients/stats", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
