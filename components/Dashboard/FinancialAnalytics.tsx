@@ -10,12 +10,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-import { Archivo } from "next/font/google";
 
-// Import Archivo font from Google Fonts
-const archivo = Archivo({
-  subsets: ["latin"],
-});
 
 type chartData = {
   month: string;
@@ -39,7 +34,7 @@ export default class Example extends PureComponent {
       <div className="bg-white py-6 px-[15px]  mt-[-0.15rem] rounded-[16px] border border-[#e8e8e8] h-[410px] md:h-[440px] flex flex-col justify-between">
         {/* Chart Section */}
         <div
-          className={`${archivo.className} flex-grow flex items-center text-[14px]`}
+          className={`flex-grow flex items-center text-[14px]`}
         >
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart

@@ -18,12 +18,6 @@ import {
   SelectContent,
   SelectLabel,
 } from "@/components/ui/select";
-import { Archivo } from "next/font/google";
-
-const archivo = Archivo({
-  weight: "500",
-  subsets: ["latin"],
-});
 
 const frquencyValues = {
   Quarterly: "Quarterly",
@@ -42,7 +36,7 @@ const Dashboard = () => {
     <div>
       {/* ✅ Financial Analytics Header */}
       <div
-        className={`${archivo.className} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}
+        className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}
       >
         <h1 className="md:text-3xl text-2xl text-gray-800 md:py-1">
           Financial Analytics

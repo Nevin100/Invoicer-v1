@@ -1,12 +1,6 @@
 import { IoIosArrowRoundUp } from "react-icons/io";
 import { Archivo } from 'next/font/google';
 
-// Import Archivo font from Google Fonts
-const archivo = Archivo({
-    subsets: ['latin'],
-});
-
-// Define the prop types for the component
 type Proptype = {
     title: string;
     amount: number;
@@ -18,7 +12,7 @@ type Proptype = {
 const FinMetricCard = ({ title, amount, incDecPercentage, isIncreased, text }: Proptype) => {
     return (
         <div
-            className={`${archivo.className} h-[107px] flex justify-between  rounded-lg`}
+            className={`h-[107px] flex justify-between  rounded-lg`}
         >
             {/* Left Section - Title and Amount */}
             <div className="flex flex-col justify-between items-start">

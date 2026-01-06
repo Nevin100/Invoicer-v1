@@ -4,12 +4,6 @@
 
 import { useState } from "react";
 import FinMetricCard from "./FinMetricCard";
-import { Archivo } from "next/font/google";
-
-// Import Archivo font from Google Fonts
-const archivo = Archivo({
-  subsets: ["latin"],
-});
 
 const FinancialMetrics = () => {
   const [view, setView] = useState("Monthly");
@@ -75,7 +69,7 @@ export const FinMetricCardExtra = ({
 }: FinMetricCardExtraProps) => {
   return (
     <div
-      className={`${archivo.className} h-[107px] flex justify-between  rounded-lg`}
+      className={` h-[107px] flex justify-between  rounded-lg`}
     >
       {/* Left Section - Title and Amount */}
       <div className="flex flex-col justify-between items-start">
