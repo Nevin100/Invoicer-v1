@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { FaBell } from "react-icons/fa";
 import { FiMenu } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { FaCirclePlus } from "react-icons/fa6";
@@ -56,11 +55,7 @@ const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
       </div>
 
       <div className="flex items-center space-x-6 relative" ref={dropdownRef}>
-        <div className="relative">
-          <FaBell className="text-gray-600 text-lg cursor-pointer" />
-          <span className="absolute top-[-2px] right-[-3px] w-2.5 h-2.5 bg-red-500 rounded-full"></span>
-        </div>
-
+      
         <div className="relative">
           <Button
             variant="outline"

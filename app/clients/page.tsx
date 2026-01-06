@@ -320,8 +320,11 @@ const ClientPage = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedClients().map((client) => (
-              <tr key={client._id}   onClick={() => router.push(`/clients/profile?id=${client._id}`)}
+        {paginatedClients().length > 0 ? (
+          <>
+              {paginatedClients().map((client) => (
+              <tr key={client._id}   
+              onClick={() => router.push(`/clients/profile?id=${client._id}`)}
               className="border-t cursor-pointer hover:bg-gray-100">
                 <td className="p-3">
                   <input type="checkbox" checked={selectedClients.includes(client._id)} onChange={() => toggleSelectClient(client._id)} className="accent-purple-600 cursor-pointer" />
@@ -340,12 +343,25 @@ const ClientPage = () => {
                 <td className="p-3">{new Date(client.createdAt).toLocaleDateString()}</td>
               </tr>
             ))}
+          </>
+        ) : (
+          <tr>
+            <td colSpan={7}  
+            className="h-[300px] text-center align-middle">
+               <div className="flex justify-center items-center h-full text-gray-500 text-2xl font-semibold">
+          No Clients have been updated yet
+        </div>
+        </td>
+          </tr>
+        )}
           </tbody>
         </table>
       </div>
 
       {/* Mobile View */}
       <div className="md:hidden flex flex-col gap-4">
+        {paginatedClients.length > 0 ? 
+        (<>
         {paginatedClients().map((client, i) => (
           <div key={i} className="border rounded-lg p-4 shadow-sm relative cursor-pointer" onClick={() => router.push(`/clients/profile?id=${client._id}`)}>
             <input type="checkbox" checked={selectedClients.includes(client._id)} onChange={() => toggleSelectClient(client._id)} className="absolute bottom-2 right-2 h-4 w-4 accent-purple-600" />
@@ -360,7 +376,11 @@ const ClientPage = () => {
             <div className="text-sm mb-1"><span className="font-semibold">Due:</span> {new Date(client.createdAt).toLocaleDateString()}</div>
             <div className="text-sm">{client.companyName}</div>
           </div>
-        ))}
+        ))}</>) : (
+          <div className="h-[60vh] flex justify-center items-center text-gray-500 text-xl font-semibold">
+      No Expenses have been made yet
+    </div>
+        )}
       </div>
 
       <div className="mt-auto">{renderPagination()}</div> {/* Pagination component call */}

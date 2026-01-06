@@ -145,7 +145,7 @@ const Expense = () => {
     setSelectAll(allSelected);
   }, [selected, filteredExpenses]);
 
-  //deloete Selected Client
+  //delete Selected Client
   const deleteSelectedExpenses = async () => {
     if (selected.length === 0) {
       Swal.fire({
@@ -335,6 +335,8 @@ const Expense = () => {
             </tr>
           </thead>
           <tbody>
+            {paginatedExpenses && paginatedExpenses.length > 0 ? (
+              <>
             {paginatedExpenses.map((item, idx) => (
               <tr key={idx} className="border-t text-sm hover:bg-gray-100">
                 <td className="p-4 pl-5">
@@ -352,40 +354,56 @@ const Expense = () => {
                 <td className="p-6">{item.description}</td>
                 <td className="p-6">{item.icon}</td>
               </tr>
-            ))}
+            ))}</>
+          ): (
+            <tr>
+      <td
+        colSpan={7}
+        className="h-[300px] text-center align-middle"
+      >
+        <div className="flex justify-center items-center h-full text-gray-500 text-2xl font-semibold">
+          No Expenses have been made yet
+        </div>
+      </td>
+    </tr>
+          )}
+            
           </tbody>
         </table>
       </div>
 
       {/* Mobile Card List */}
-      <div className="md:hidden space-y-2">
-        {filteredExpenses.map((item, idx) => (
-          <div key={idx} className="bg-white border p-3 rounded-xl shadow-sm">
-            <div className="flex justify-between">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  className="accent-black"
-                  checked={selected.includes(idx)}
-                  onChange={() => toggleCheckbox(idx)}
-                />
-                <p className="font-semibold">{item.amount}</p>
-              </div>
-              <span className="text-sm text-green-500 font-medium">
-                {item.status || "Paid"}
-              </span>
+      <div className="md:hidden">
+  {filteredExpenses.length > 0 ? (
+    <div className="space-y-2">
+      {filteredExpenses.map((item, idx) => (
+        <div key={idx} className="bg-white border p-3 rounded-xl shadow-sm">
+          <div className="flex justify-between">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                className="accent-black"
+                checked={selected.includes(idx)}
+                onChange={() => toggleCheckbox(idx)}
+              />
+              <p className="font-semibold">{item.amount}</p>
             </div>
-            <div className="text-sm text-gray-500 mt-1">{item.category}</div>
-            <div className="text-sm text-gray-500">{item.date}</div>
-            <div className="text-sm text-gray-500">{item.description}</div>
+            <span className="text-sm text-green-500 font-medium">
+              {item.status || "Paid"}
+            </span>
           </div>
-        ))}
-      </div>
-
-
-
-
-
+          <div className="text-sm text-gray-500 mt-1">{item.category}</div>
+          <div className="text-sm text-gray-500">{item.date}</div>
+          <div className="text-sm text-gray-500">{item.description}</div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div className="h-[60vh] flex justify-center items-center text-gray-500 text-xl font-semibold">
+      No Expenses have been made yet
+    </div>
+  )}
+</div>
 
       {renderPagination()} {/* Pagination component call */}
     </div>

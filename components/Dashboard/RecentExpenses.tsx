@@ -21,12 +21,9 @@ const RecentExpenses = () => {
           },
         });
 
-
-
         if (!response.ok) {
           throw new Error("Failed to fetch expenses");
         }
-
 
         const data = await response.json();
         setExpenses(data.expenses);
@@ -46,7 +43,7 @@ const RecentExpenses = () => {
   return (
     <div className=" h-full bg-white p-5 rounded-xl shadow-md mt-6">
       {/* Header */}
-      <h2 className="text-lg font-semibold text-black mb-4">Recent Expenses</h2>
+      <h2 className="text-lg font-semibold text-black mb-4">Recent Expenses List:</h2>
 
       {/* Table Header */}
       <div className="grid grid-cols-3 pb-2 border-b text-gray-500 text-sm font-semibold text-left">

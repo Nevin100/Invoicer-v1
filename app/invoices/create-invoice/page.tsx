@@ -2,7 +2,6 @@
 
 import { GoX } from "react-icons/go";
 import { useRouter } from "next/navigation";
-import { Archivo } from "next/font/google";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import CreateInvoiceForm from "@/components/invoice/create_invoice_form";
@@ -15,16 +14,11 @@ import CreateInvoiceForm from "@/components/invoice/create_invoice_form";
 //   mobile: string;
 // }
 
-const archivo = Archivo({
-  weight: "500",
-  subsets: ["latin"],
-});
-
 const InvoiceCreatorPage = () => {
   const router = useRouter();
 
   return (
-    <div className={`${archivo.className} `}>
+    <div>
       <Card className="w-full lg:w-2/3 bg-white p-6 rounded-none  ">
         <CardHeader className="flex items-center gap-3">
           <GoX

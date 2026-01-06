@@ -242,7 +242,7 @@ const CreateInvoiceForm = () => {
                       selected={field.value}
                       onSelect={(date) => {
                         field.onChange(date);
-                        setIssueDatePopoverOpen(false); // Close popover on selection
+                        setIssueDatePopoverOpen(false);
                       }}
                       initialFocus
                     />
@@ -365,7 +365,7 @@ const CreateInvoiceForm = () => {
                       selected={field.value}
                       onSelect={(date) => {
                         field.onChange(date);
-                        setDueDatePopoverOpen(false); // Close popover on selection
+                        setDueDatePopoverOpen(false); 
                       }}
                       initialFocus
                     />
@@ -470,7 +470,7 @@ const CreateInvoiceForm = () => {
                       selected={field.value}
                       onSelect={(date) => {
                         field.onChange(date);
-                        setRecurringIssueDatePopoverOpen(false); // Close popover on selection
+                        setRecurringIssueDatePopoverOpen(false); 
                       }}
                       initialFocus
                     />
@@ -515,7 +515,7 @@ const CreateInvoiceForm = () => {
                       selected={field.value}
                       onSelect={(date) => {
                         field.onChange(date);
-                        setRecurringDueDatePopoverOpen(false); // Close popover on selection
+                        setRecurringDueDatePopoverOpen(false);
                       }}
                       initialFocus
                     />
@@ -626,7 +626,7 @@ const CreateInvoiceForm = () => {
           {/* Add Item Button */}
           <div className="w-full flex justify-center ">
             <button
-              type="button" // ✅ Add this line
+              type="button" 
               className="w-[118px] flex justify-center items-center border rounded-[7px] px-[9px] py-[8px] cursor-pointer hover:bg-slate-50"
               onClick={() =>
                 append({

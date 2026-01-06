@@ -38,28 +38,34 @@ const NewCustomer = () => {
   return (
     <div className="bg-white rounded-lg shadow p-6 h-full">
       <div className="flex flex-row items-center justify-between pb-2">
-        <h3 className="text-md font-medium">New Customer</h3>
+        <h3 className="text-lg font-semibold text-black mb-4">Your customers</h3>
         <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-green-50 text-green-600 border-green-100">
           Open
         </div>
       </div>
       <div className="flex flex-col">
-        <div className="text-2xl font-bold">{total}</div>
-        <div className="h-[80px] w-full pt-4">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
-              <XAxis dataKey="name" hide />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#4f46e5"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        {total > 0 ? (
+          <>
+          <div className="text-2xl font-bold">{total}</div>
+          <div className="h-[80px] w-full pt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data}>
+                <XAxis dataKey="name" hide />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#4f46e5"
+                  strokeWidth={2}
+                  dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          </>):  
+          <div className="text-2xl md:py-4 flex font-semibold items-center justify-center">
+            <span>No Customers</span>
+            </div>} 
+        
         {data.length > 0 && (
           <div className="flex items-center justify-between text-xs text-gray-500 pt-2">
             <span>{data[0].name}</span>

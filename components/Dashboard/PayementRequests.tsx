@@ -72,9 +72,6 @@ const PaymentRequests = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-5">
         <h2 className="text-xl font-semibold text-gray-800">Clients</h2>
-        <select className="border border-gray-300 px-3 py-1.5 rounded-lg text-gray-700 text-sm focus:outline-none">
-          <option>All</option>
-        </select>
       </div>
 
       {/* Table Header */}
