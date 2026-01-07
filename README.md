@@ -3,7 +3,7 @@
 
 **Invoicer v1** is a modern, full-stack **monolithic invoice and finance management platform**, currently under active development and approximately **80–85% complete**.
 
-The platform is designed to help individuals, freelancers, and small businesses manage **invoices, expenses, clients, payments, and analytics** from a multiple - responsive dashboard.
+The platform is designed to help individuals, freelancers, and small businesses manage **invoices, expenses, clients, payments, and analytics** from responsive dashboards.
 
 > 🚧 **Status:** Actively under development  
 > 🌐 **Live Demo:** https://invoicer-taupe.vercel.app/login  
