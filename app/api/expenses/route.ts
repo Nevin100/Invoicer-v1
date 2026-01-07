@@ -1,7 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-//api/expenses/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import connectDB from "@/lib/database/db_connection";
@@ -10,7 +7,7 @@ import { expenseSchema } from "@/utils/validations";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
-// 👇 POST handler for creating expenses
+// POST handler for creating expenses
 export async function POST(req: NextRequest) {
   await connectDB();
 
@@ -69,7 +66,7 @@ export async function GET(req: NextRequest) {
         minute: "2-digit",
         hour12: true,
       }),
-      icon: "💸", // Default icon
+      icon: "💸",
       description: exp.description,
     }));
 

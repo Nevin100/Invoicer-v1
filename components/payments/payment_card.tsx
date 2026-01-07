@@ -10,7 +10,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import RazorpayDialog from "./razorpay_dialog"; // Import Razorpay dialog component
+import RazorpayDialog from "./razorpay_dialog";
 import { PaymentLogoPropType } from "@/app/(payment)/payments/page";
 
 export default function PaymentCard({ logo, platformName, imgWidth }: PaymentLogoPropType) {

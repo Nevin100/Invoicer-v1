@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import RecentExpensesLoading from "../loading_ui/RecentExpensesLoading";
 
 const RecentExpenses = () => {
   const [expenses, setExpenses] = useState<{ category: string; amount: string; date: string; icon: string }[]>([]);
@@ -37,7 +36,26 @@ const RecentExpenses = () => {
     fetchExpenses();
   }, []);
 
-  if (loading) return <RecentExpensesLoading />;
+  if (loading) {
+  return (
+    <div className="bg-white border border-[#e8e8e8] rounded-[16px] h-[410px] md:h-[440px] flex items-center justify-center">
+      <div className="flex items-center gap-4">
+        {/* Spinner */}
+        <div className="relative w-10 h-10">
+          {/* Outer circle */}
+          <div className="absolute inset-0 rounded-full border-4 border-blue-200 animate-spin" />
+          {/* Inner circle */}
+          <div className="absolute inset-2 rounded-full bg-[#0052CC] animate-ping" />
+        </div>
+
+        {/* Text */}
+        <p className="text-gray-600 text-sm">
+          Loading the expense List...
+        </p>
+      </div>
+    </div>
+  );
+}
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
@@ -84,7 +102,7 @@ const RecentExpenses = () => {
             );
           })
         ) : (
-          <p className="text-center text-gray-500 py-4">No expenses found.</p>
+          <p className="text-center text-gray-500 py-4">No expense List found .</p>
         )}
       </div>
     </div>

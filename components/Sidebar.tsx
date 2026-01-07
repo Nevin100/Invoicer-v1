@@ -29,9 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLinkClick }) => {
   ];
 
   const handleLinkClick = (clickedPath: string) => {
-    if (pathname === clickedPath) return; // avoid re-routing if already on same path
-
-    // Optional: Notify topbar or handle sidebar behavior
+    if (pathname === clickedPath) return;
     window.dispatchEvent(new Event("topbar-start"));
     if (onLinkClick && window.innerWidth < 768) {
       onLinkClick();
@@ -62,7 +60,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onLinkClick }) => {
               <div
                 className={`w-[3px]  ${pathname === item.path ? "bg-[#5E84EC]" : ""} `}
               >
-                {/* To show the current tab */}
               </div>
             </div>
           ))}

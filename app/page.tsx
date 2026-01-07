@@ -9,21 +9,6 @@ import FinancialAnalytics from "@/components/Dashboard/FinancialAnalytics";
 import NewCustomer from "@/components/Dashboard/NewCustomer";
 import ExpensesChart from "@/components/Dashboard/ExpensesChart";
 import FinancialMetrics from "@/components/Dashboard/FinancialMetrics";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectItem,
-  SelectGroup,
-  SelectContent,
-  SelectLabel,
-} from "@/components/ui/select";
-
-const frquencyValues = {
-  Quarterly: "Quarterly",
-  Monthly: "Monthly",
-  Yearly: "Yearly",
-};
 
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -38,28 +23,9 @@ const Dashboard = () => {
       <div
         className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}
       >
-        <h1 className="md:text-3xl text-2xl text-gray-800 md:py-1">
+        <h1 className="md:text-4xl text-2xl text-gray-800 font-semibold md:p-2">
           Financial Analytics
         </h1>
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Quarterly" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Frequency</SelectLabel>
-              <SelectItem value={frquencyValues.Monthly}>
-                {frquencyValues.Monthly}
-              </SelectItem>
-              <SelectItem value={frquencyValues.Quarterly}>
-                {frquencyValues.Quarterly}
-              </SelectItem>
-              <SelectItem value={frquencyValues.Yearly}>
-                {frquencyValues.Yearly}
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
       </div>
 
       {/* ✅ Analytics & Metrics Section */}
@@ -74,9 +40,10 @@ const Dashboard = () => {
 
       {/* ✅ Your Overview Section */}
       <div className="mt-[22px]">
-        <h2 className="md:text-3xl text-2xl text-gray-800 font-medium md:py-1">
+        <h1 className="md:text-4xl text-2xl text-gray-800 font-semibold md:p-2">
+        
           Your Overview
-        </h2>
+        </h1>
       </div>
 
       {/* ✅ Payment Requests, Recent Expenses, New Customers & Expenses Chart */}

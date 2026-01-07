@@ -13,7 +13,7 @@ import Swal from "sweetalert2";
 interface Expense {
   _id: string;
   category: string;
-  amount: string; // already formatted like "₹ 1200"
+  amount: string;
   icon: string;
   description: string;
   date: string;
@@ -102,12 +102,25 @@ const ExpensesChart = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="bg-white p-5 rounded-lg shadow-md w-full max-w-2xl text-center">
-        <p className="text-gray-500">Loading expenses...</p>
+  return (
+    <div className="bg-white border border-[#e8e8e8] rounded-[16px] h-[410px] md:h-[440px] flex items-center justify-center">
+      <div className="flex items-center gap-4">
+        {/* Spinner */}
+        <div className="relative w-10 h-10">
+          {/* Outer circle */}
+          <div className="absolute inset-0 rounded-full border-4 border-blue-200 animate-spin" />
+          {/* Inner circle */}
+          <div className="absolute inset-2 rounded-full bg-[#0052CC] animate-ping" />
+        </div>
+
+        {/* Text */}
+        <p className="text-gray-600 text-sm">
+          Loading the expenses...
+        </p>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   if (!stats || data.length === 0) {
     return (
@@ -123,7 +136,7 @@ const ExpensesChart = () => {
 
       <div className="flex items-center">
         {/* Chart Container */}
-        <div className="w-1/2 gap-4 h-40">
+        <div className="w-1/2 gap-5 h-40">
           <ResponsiveContainer width="100%" height="100%">
             <RadialBarChart
               innerRadius="50%"
@@ -151,16 +164,6 @@ const ExpensesChart = () => {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Total Expense Info */}
-      <div className="text-center mt-4">
-        <h2 className="text-2xl font-bold text-gray-900">
-          ₹{stats.totalAmount}
-        </h2>
-        <p className="text-xl text-gray-500">
-          Top category: {stats.topCategory}
-        </p>
       </div>
     </div>
   );
