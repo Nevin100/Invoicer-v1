@@ -59,7 +59,7 @@ const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
         <div className="relative">
           <Button
             variant="outline"
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-purple-600"
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600"
             onClick={() => setDropdownOpen(!dropdownOpen)}
           >
             <FaCirclePlus />
