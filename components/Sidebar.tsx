@@ -1,6 +1,7 @@
 // Sidebar.tsx
 "use client";
 
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   FaFileInvoiceDollar,
@@ -41,9 +42,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onLinkClick }) => {
   return (
     <div className=" h-full w-[250px] bg-white shadow-md py-5  font-['Archivo',sans-serif] flex flex-col justify-between relative">
       <div>
-        <h2 className=" text-xl font-bold text-gray-800 ml-5 mb-8">
-          Instant Paid
-        </h2>
+        <span className=" ml-1 flex justify-center items-center mb-8">
+          <Image src="/InstantPaid.jpeg" alt="Financea Logo" width={200} height={200}  />
+        </span>
         <nav className=" flex flex-col ">
           {menuItems.map((item, index) => (
             <div

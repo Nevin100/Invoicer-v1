@@ -49,10 +49,10 @@ export default function SignupPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Signup failed");
 
-      // ✅ Token is stored only in Redux, NOT in cookies
+      // token is stored only in Redux, NOT in cookies
       dispatch(login(data.token));
 
-      // ✅ Redirect after successful signup
+      // Redirect after successful signup
        Swal.fire({
           title: "LogIn Successfully!",
           icon: "success",
@@ -76,7 +76,7 @@ export default function SignupPage() {
         </button>
 
         <div className="flex justify-center mb-6 py-2">
-          <Image src="/FinanceaLogo.png" alt="Financea Logo" width={170} height={60} />
+          <Image src="/InstantPaid.jpeg" alt="Financea Logo" width={290} height={400} />
         </div>
 
         <h2 className="text-2xl font-semibold mb-1">Sign up</h2>

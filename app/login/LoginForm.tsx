@@ -99,7 +99,7 @@ export default function LoginPage() {
         </button>
 
         <div className="flex justify-center mb-6 py-2">
-          <Image src="/FinanceaLogo.png" alt="Financea Logo" width={170} height={60} />
+          <Image src="/InstantPaid.jpeg" alt="Financea Logo" width={290} height={400} />
         </div>
 
         <h2 className="text-2xl font-semibold mb-1">Log in</h2>
