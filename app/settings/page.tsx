@@ -26,16 +26,17 @@ const Settings = () => {
       {/* Prototype Info Section */}
       <div className="w-full max-w-7xl bg-white rounded-2xl shadow-lg p-8 text-center mb-10">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
-          Prototype Version 1
+          Invoicer Version 1
         </h1>
         <p className="text-gray-600 text-base md:text-lg leading-relaxed">
-          This prototype showcases the core concept. The remaining features are
-          currently{" "}
-          <span className="text-blue-600 font-medium">
-            under negotiation and discussion
-          </span>{" "}
-          and will be available in future versions.
-        </p>
+  This project is in an advanced stage of development, with most core
+  functionalities already implemented. The remaining features are{" "}
+  <span className="text-blue-600 font-medium">
+    actively being developed and refined
+  </span>{" "}
+  for future updates.
+</p>
+
       </div>
 
       {/* Logout Section */}
