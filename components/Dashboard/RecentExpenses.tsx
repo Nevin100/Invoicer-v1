@@ -94,7 +94,7 @@ const RecentExpenses = () => {
                 </div>
 
                 {/* Amount */}
-                <span className="text-center font-medium text-gray-700">{expense.amount}</span>
+                <span className="text-center font-medium text-gray-700">₹{expense.amount}</span>
 
                 {/* Date */}
                 <span className="text-right text-gray-500">{formattedDate}</span>

@@ -262,7 +262,7 @@ const ClientPage = () => {
         </div>
         <div className="bg-white border rounded-lg p-4">
           <p className="text-xl text-gray-500 pb-2">Total Payment</p>
-          <h3 className="md:text-3xl text-xl font-bold">${metrics.totalPayment}</h3>
+          <h3 className="md:text-3xl text-xl font-bold">₹{metrics.totalPayment}</h3>
         </div>
         
       </div>
@@ -329,7 +329,7 @@ const ClientPage = () => {
                 <td className="p-3">
                   <input type="checkbox" checked={selectedClients.includes(client._id)} onChange={() => toggleSelectClient(client._id)} className="accent-purple-600 cursor-pointer" />
                 </td>
-                <td className="p-3 font-bold text-black">${client.serviceCharge}</td>
+                <td className="p-3 font-bold text-black">₹{client.serviceCharge}</td>
                 <td className="p-3">
                   <span className="bg-green-100 text-green-800 px-2 py-1 text-xs rounded-full">Paid</span>
                 </td>
