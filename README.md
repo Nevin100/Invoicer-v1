@@ -1,5 +1,5 @@
 # 🧾 Invoicer v1  
-### Invoice, Expense & Payment Management Platform
+<img width="1366" height="607" alt="image" src="https://github.com/user-attachments/assets/ead70ada-6964-4147-84bc-dc65c4673ffa" className="align-center"/>
 
 **Invoicer v1** is a modern, full-stack **monolithic invoice and finance management platform**, currently under active development and approximately **80–85% complete**.
 
