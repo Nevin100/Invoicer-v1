@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/database/db_connection";
@@ -13,7 +12,8 @@ export async function POST(req: Request) {
     await connectDB();
 
     const token = req.headers.get("authorization")?.split(" ")[1];
-    if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    if (!token)
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
     let userId: string;
     try {
@@ -23,9 +23,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: err }, { status: 403 });
     }
 
-
     const body = await req.json();
-
 
     const validatedBody = invoiceSchema.parse(body.data);
 
@@ -51,17 +49,23 @@ export async function POST(req: Request) {
   }
 }
 
-//Get Request : 
+//Get Request :
 export async function GET(req: Request) {
   try {
-    await connectDB()
+    await connectDB();
 
-    // Fetch invoices for the authenticated user
-    const invoices = await Invoice.find();
-
-    if (!invoices) {
-      return NextResponse.json({ message: "No invoices found" }, { status: 404 });
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+
+    // Fetch invoices for logged-in user
+    const invoices = await Invoice.find({ user: decoded.userId })
+      .populate("client", "clientName email")
+      .sort({ createdAt: -1 });
 
     return NextResponse.json(invoices, { status: 200 });
   } catch (error: any) {

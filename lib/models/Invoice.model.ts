@@ -40,6 +40,13 @@ const invoiceSchema = new mongoose.Schema({
     required: true, 
     default: '',
   },
+  
+  status: {
+    type: String,
+    enum: ['Paid','Pending', 'Overdue'],
+    default: 'Pending'
+  },
+
   termsAndConditions: {
     type: String,
     required: true,

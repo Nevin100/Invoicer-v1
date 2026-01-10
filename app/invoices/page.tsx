@@ -4,6 +4,7 @@
 import React, { useState, useEffect, Suspense, lazy } from "react";
 import { FaSearch, FaDownload } from "react-icons/fa";
 import axios from "axios";
+import InvoiceDetailsModal from "@/components/invoice/InvoiceDetailsModal";
 
 // Lazy Load InvoiceTable
 const InvoiceTable = lazy(() => import("./InvoiceTable"));
@@ -19,16 +20,19 @@ const Loading = () => (
 
 const InvoicePage = () => {
   type Invoice = {
+    id: string;
     name: string;
     email: string;
     invoiceNo: string;
     description: string;
     status: string;
-    amount: string;
+    amount: number;
+    itemsCount: number;
+    rawInvoice: any;
     date: string;
     dueDate: string;
   };
-  // Add this util function at the top or bottom of the file
+
   const exportToCSV = (data: Invoice[]) => {
     const headers = [
       "Name",
@@ -63,7 +67,7 @@ const InvoicePage = () => {
     link.click();
     document.body.removeChild(link);
   };
-
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,27 +85,35 @@ const InvoicePage = () => {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/invoices");
+        const res = await axios.get<any>("/api/invoices", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         const rawData = res.data as any[];
-
+        console.log("Invoices Data : ", rawData);
         const transformedInvoices: Invoice[] = rawData.map((inv: any) => {
           const totalAmount =
             inv.items?.reduce(
-              (sum: number, item: any) => sum + (item.total || 0),
+              (sum: number, item: any) => sum + item.total,
               0
             ) ?? 0;
 
           const discountAmount = (inv.discount / 100) * totalAmount;
           const taxAmount = (inv.tax / 100) * totalAmount;
+
           const finalAmount = totalAmount - discountAmount + taxAmount;
 
           return {
-            name: "N/A", // You can fetch client name via population if needed
-            email: "N/A", // Optional: if user/client is populated
-            invoiceNo: `#${inv.invoiceNumber}`,
-            description: inv.description || inv.items?.[0]?.name || "N/A",
+            id: inv._id,
+            name: inv.client?.clientName || "N/A",
+            email: inv.client?.email || "N/A",
+            invoiceNo: inv.invoiceNumber,
+            description: inv.description,
             status: inv.status || "Pending",
-            amount: `$${finalAmount.toFixed(2)}`,
+            amount: finalAmount,
+            itemsCount: inv.items?.length || 0,
+            rawInvoice: inv,
             date: new Date(inv.issueDate).toLocaleDateString(),
             dueDate: new Date(inv.dueDate).toLocaleDateString(),
           };
@@ -112,8 +124,7 @@ const InvoicePage = () => {
 
         // Metric calculation
         const totalPayment = transformedInvoices.reduce((acc, curr) => {
-          const num = parseFloat(curr.amount.replace(/[^0-9.-]+/g, ""));
-          return acc + (isNaN(num) ? 0 : num);
+          return acc + curr.amount;
         }, 0);
 
         const outstanding = transformedInvoices.filter(
@@ -125,8 +136,7 @@ const InvoicePage = () => {
           totalPayment,
           outstandingInvoices: outstanding.length,
           outstandingPayment: outstanding.reduce((acc, inv) => {
-            const amt = parseFloat(inv.amount.replace(/[^0-9.-]+/g, ""));
-            return acc + (isNaN(amt) ? 0 : amt);
+            return acc + inv.amount;
           }, 0),
         });
       } catch (error) {
@@ -164,7 +174,7 @@ const InvoicePage = () => {
       inv.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       inv.invoiceNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
       inv.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      inv.amount.toLowerCase().includes(searchQuery.toLowerCase());
+      inv.amount.toString().includes(searchQuery);
 
     return matchesStatus && matchesSearch;
   });
@@ -179,20 +189,20 @@ const InvoicePage = () => {
         </div>
         <div className="bg-white border rounded-lg p-4">
           <p className="text-xl text-gray-500">Total Payment</p>
-          <h3 className="text-3xl font-bold">${metrics.totalPayment}</h3>
+          <h3 className="text-3xl font-bold">₹{metrics.totalPayment}</h3>
         </div>
         <div className="bg-white border rounded-lg p-4">
-          <p className="text-xl text-gray-500">Outstanding Invoices</p>
+          <p className="text-xl text-gray-500">Pending Invoices</p>
           <h3 className="text-3xl font-bold">{metrics.outstandingInvoices}</h3>
         </div>
         <div className="bg-white border rounded-lg p-4">
-          <p className="text-xl text-gray-500">Outstanding Payment</p>
-          <h3 className="text-3xl font-bold">${metrics.outstandingPayment}</h3>
+          <p className="text-xl text-gray-500">Pending Payment</p>
+          <h3 className="text-3xl font-bold">₹{metrics.outstandingPayment}</h3>
         </div>
       </div>
 
       {/* Filters and Search */}
-      <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-4 sm:gap-5 mb-4">
         <div className="relative w-full sm:w-1/3">
           <input
             type="text"
@@ -207,7 +217,7 @@ const InvoicePage = () => {
 
         <div className="flex flex-wrap items-center gap-2">
           <button
-            className="border px-4 py-2 rounded-lg text-black flex items-center"
+            className="border px-4 py-2 rounded-lg text-black flex items-center hover:bg-gray-200 hover:cursor-pointer"
             onClick={() => exportToCSV(filteredInvoices)}
           >
             <FaDownload className="mr-2" /> Export
@@ -245,8 +255,16 @@ const InvoicePage = () => {
             invoices={filteredInvoices}
             selectedInvoices={selectedInvoices}
             handleCheckboxChange={handleCheckboxChange}
+            onViewDetails={(inv) => setSelectedInvoice(inv)}
           />
         </Suspense>
+      )}
+      {/* Invoice Details Modal */}
+      {selectedInvoice && (
+        <InvoiceDetailsModal
+          invoice={selectedInvoice.rawInvoice}
+          onClose={() => setSelectedInvoice(null)}
+        />
       )}
     </div>
   );

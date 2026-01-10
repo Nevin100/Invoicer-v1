@@ -1,12 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 
 type Invoice = {
+  id: string;
   name: string;
   email: string;
   invoiceNo: string;
   description: string;
   status: string;
-  amount: string;
+  amount: number;
+  itemsCount: number;
+  rawInvoice: any;
   date: string;
   dueDate: string;
 };
@@ -14,13 +18,15 @@ type Invoice = {
 interface InvoiceTableProps {
   invoices: Invoice[];
   selectedInvoices: string[];
-  handleCheckboxChange: (invoiceNo: string) => void;
+  handleCheckboxChange: (id: string) => void;
+  onViewDetails: (invoice: Invoice) => void;
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({
   invoices,
   selectedInvoices,
   handleCheckboxChange,
+  onViewDetails,
 }) => {
   return (
     <div className="w-full overflow-x-auto">
@@ -59,7 +65,17 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   {invoice.status}
                 </span>
               </td>
-              <td className="py-3 px-4 font-semibold">{invoice.amount}</td>
+              <td className="py-3 px-4">
+                <div className="font-semibold">₹{invoice.amount}</div>
+
+                <button
+                  onClick={() => onViewDetails(invoice)}
+                  className="text-xs text-purple-600 hover:underline mt-1"
+                >
+                  View details ({invoice.itemsCount} items)
+                </button>
+              </td>
+
               <td className="py-3 px-4">{invoice.date}</td>
               <td className="py-3 px-4">{invoice.dueDate}</td>
             </tr>
