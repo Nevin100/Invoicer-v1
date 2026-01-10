@@ -1,19 +1,36 @@
-type Proptype = {
-  title: string;
-  amount: number;
+type FinMetricCardProps = {
+  label: string;
+  value: string;
+  highlight?: boolean;
 };
 
-const FinMetricCard = ({ title, amount }: Proptype) => {
+const FinMetricCard = ({
+  label,
+  value,
+  highlight = false,
+}: FinMetricCardProps) => {
   return (
-    <div className="h-[107px] flex items-center justify-around rounded-lg px-3 rounded-md border-2 border-blue-600 bg-blue-50/40">
-      {/* Title */}
-      <p className="text-2xl sm:text-base md:text-2xl text-blue-800 font-semibold">
-        {title}:
+    <div
+      className={`
+        flex items-center justify-between
+        px-4 sm:px-5 md:px-6
+        h-auto md:h-[107px]
+        rounded-xl border
+        ${
+          highlight
+            ? "border-blue-600 bg-blue-50"
+            : "border-slate-200 bg-slate-50"
+        }
+      `}
+    >
+      {/* Label */}
+      <p className="text-sm sm:text-base font-medium text-slate-600">
+        {label}
       </p>
 
-      {/* Amount */}
-      <p className="text-xl sm:text-3xl font-bold text-blue-900 ">
-        ₹{amount}
+      {/* Value */}
+      <p className="text-lg sm:text-2xl font-semibold text-slate-900">
+        {value}
       </p>
     </div>
   );
