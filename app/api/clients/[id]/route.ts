@@ -43,3 +43,33 @@ export async function GET(
     );
   }
 }
+
+// export async function PUT(
+//   req: NextRequest,
+//   { params } : { params : Promise<Params> }
+// ) {
+//   await connectDB();
+
+//   try {
+//     const authHeader = req.headers.get("authorization");
+//   if (!authHeader || !authHeader.startsWith("Bearer ")) {
+//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+//   }
+//     const token = authHeader.split(" ")[1];
+
+//     const decoded: any = jwt.verify(token, JWT_SECRET);
+//     const userId = decoded.userId;
+//     const clientId = id;
+
+//     const client = await Client.findOne({ _id: clientId, user: userId });
+    
+//   } catch (error) {
+//     console.error("Error in updating Client", error);
+//     return NextResponse.json({
+//       error: "Server error or invalid token"
+//     },
+//   {
+//     status : 500
+//   })
+//   }
+// }

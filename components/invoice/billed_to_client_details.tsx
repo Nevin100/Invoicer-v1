@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { getTelephoneCode } from "@/lib/helpers/create_invoice/getTelephoneCode";
@@ -12,21 +11,24 @@ interface PropType {
 export default function BilledToClientDetails({
   selectedClientDetails,
 }: PropType) {
-  if (selectedClientDetails === null) {
+  if (!selectedClientDetails) {
     return (
-      <Card className="w-full lg:h-[155px] rounded-[16px] px-[24px] py-[10px] bg-[#FBFCFE]">
-        <CardTitle className="text-[#532B88] text-[20px]">Billed To</CardTitle>
+      <Card className="w-full min-h-[150px] rounded-2xl px-6 py-4 bg-[#FBFCFE]">
+        <CardHeader>
+          <CardTitle className="text-[#532B88] text-xl">
+            Billed To
+          </CardTitle>
+        </CardHeader>
         <CardContent className="flex justify-center items-center">
-          <h5 className="scroll-m-20  italic tracking-tight">
-            No Clients Selected !
-          </h5>
+          <p className="italic text-muted-foreground">
+            No client selected
+          </p>
         </CardContent>
       </Card>
     );
   }
 
   const {
-    _id,
     clientName,
     companyName,
     email,
@@ -40,42 +42,53 @@ export default function BilledToClientDetails({
   const countryTelephoneCode = getTelephoneCode(country);
 
   return (
-    <Card className="w-full rounded-[16px] px-[24px] py-[10px] bg-[#FBFCFE]">
-      <CardHeader className="flex justify-between">
-        <CardTitle className="text-[#532B88] text-[20px]">
-          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-            Billed To
-          </h3>
+    <Card className="w-full rounded-2xl px-6 py-4 bg-[#FBFCFE]">
+      <CardHeader>
+        <CardTitle className="text-[#532B88] text-xl">
+          Billed To
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="flex">
-          <h5 className="scroll-m-20 text-lg  tracking-tight mr-[10px]">
-            {clientName}
-          </h5>
 
-          <h5 className="text-[#737982] scroll-m-20 text-lg  tracking-tight">
-            {`From: ${companyName}`}
-          </h5>
+      <CardContent className="space-y-4">
+        {/* NAME */}
+        <div className="flex flex-wrap gap-2 items-center">
+          <h3 className="text-lg font-semibold">{clientName}</h3>
+          {companyName && (
+            <span className="text-sm text-muted-foreground">
+              ({companyName})
+            </span>
+          )}
         </div>
 
-        <blockquote className="mt-6 border-l-2 pl-6 italic text-[#363C45]">
-          {`${address},${state},${country}-${postal}`}
-        </blockquote>
+        {/* ADDRESS */}
+        {(address || state || country) && (
+          <blockquote className="border-l-2 pl-4 italic text-sm text-gray-700">
+            {[address, state, country, postal]
+              .filter(Boolean)
+              .join(", ")}
+          </blockquote>
+        )}
 
-        <div className="flex text-[14px] leading-7 [&:not(:first-child)]:mt-6">
-          <p className="text-[#737982] mr-[10px]">Email</p>
+        {/* EMAIL */}
+        {email && (
+          <div className="flex text-sm">
+            <span className="text-muted-foreground mr-2">
+              Email:
+            </span>
+            <span>{email}</span>
+          </div>
+        )}
 
-          <p>{email}</p>
-        </div>
-
-        <div className="flex text-[14px] leading-7 ">
-          <p className="text-[#737982] mr-[10px]">Phone</p>
-
-          <p className="mr-[5px]">{countryTelephoneCode}</p>
-
-          <p>{mobile}</p>
-        </div>
+        {/* PHONE */}
+        {mobile && (
+          <div className="flex text-sm">
+            <span className="text-muted-foreground mr-2">
+              Phone:
+            </span>
+            <span className="mr-1">{countryTelephoneCode}</span>
+            <span>{mobile}</span>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

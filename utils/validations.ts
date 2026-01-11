@@ -59,25 +59,48 @@ export const expenseSchema = z.object({
 
 //Invoice Validation :
 export const invoiceSchema = z.object({
-  clientId: z.string(),
-  invoiceNumber: z.string().min(1),
+  /* BASIC INFO */
+  clientId: z.string().min(1, "Client is required"),
+  invoiceNumber: z.string().min(1, "Invoice number is required"),
+
   issueDate: z.coerce.date(),
-  dueDate: z.coerce.date(),
-  items: z.array(
-    z.object({
-      name: z.string().min(1),
-      qty: z.number().positive(),
-      perHour: z.number().positive(),
-      rate: z.number().nonnegative(),
-      total: z.number().nonnegative(),
-    })
-  ),
-  description: z.string().min(1),
-  termsAndConditions: z.string().min(1),
-  discount: z.number().nonnegative(),
-  tax: z.number().nonnegative(),
-  isRecurring: z.boolean().optional().default(false),
-  recurringPeriod: z.enum(["Monthly", "Yearly"]).optional().default("Monthly"),
+  dueDate: z.coerce.date({
+  required_error: "Due date is required",
+})
+,
+
+  /* ITEMS */
+  items: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Item name is required"),
+        quantity: z.coerce.number().positive("Quantity must be greater than 0"),
+        rate: z.coerce.number().nonnegative("Rate cannot be negative"),
+        ishourly: z.boolean()
+      })
+    )
+    .min(1, "At least one item is required"),
+
+  /* CALCULATED TOTALS (SET VIA UI LOGIC) */
+  subTotal: z.coerce.number().nonnegative(),
+  discountAmount: z.coerce.number().nonnegative(),
+  taxAmount: z.coerce.number().nonnegative(),
+  totalAmount: z.coerce.number().nonnegative(),
+
+  /* PERCENT INPUTS */
+  discountPercent: z.coerce.number().min(0).max(100).default(0),
+  taxPercent: z.coerce.number().min(0).max(100).default(0),
+
+  /* OPTIONAL TEXT */
+  description: z.string().optional().default(""),
+  termsAndConditions: z.string().optional().default(""),
+
+  /* RECURRING */
+  isRecurring: z.boolean().default(false),
+  recurringPeriod: z
+    .enum(["Monthly", "Weekly", "Quarterly", "Yearly"])
+    .default("Monthly"),
 });
 
-export type InvoiceInput = z.infer<typeof invoiceSchema>;
+export type InvoiceInput = z.input<typeof invoiceSchema>;
+

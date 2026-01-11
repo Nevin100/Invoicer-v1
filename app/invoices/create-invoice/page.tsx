@@ -6,14 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import CreateInvoiceForm from "@/components/invoice/create_invoice_form";
 
-// interface Client {
-//   _id: string;
-//   clientName: string;
-//   companyName: string;
-//   email: string;
-//   mobile: string;
-// }
-
 const InvoiceCreatorPage = () => {
   const router = useRouter();
 
