@@ -92,8 +92,8 @@ export const invoiceSchema = z.object({
   taxPercent: z.coerce.number().min(0).max(100).default(0),
 
   /* OPTIONAL TEXT */
-  description: z.string().optional().default(""),
-  termsAndConditions: z.string().optional().default(""),
+  description: z.string().optional().default("Invoice Items"),
+  termsAndConditions: z.string().optional().default("Please pay within 15 days from the date of invoice"),
 
   /* RECURRING */
   isRecurring: z.boolean().default(false),

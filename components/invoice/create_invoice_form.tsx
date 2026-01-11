@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { IoAddCircle } from "react-icons/io5";
 import { GoX } from "react-icons/go";
 import { CalendarIcon } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 import { invoiceSchema, InvoiceInput } from "@/utils/validations";
 import { fetchClients } from "@/lib/helpers/create_invoice/fetchClients";
@@ -37,6 +38,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import BilledToClientDetails from "./billed_to_client_details";
+import { useRouter } from "next/navigation";
 
 export interface Client {
   _id: string;
@@ -54,7 +56,7 @@ export interface Client {
 const CreateInvoiceForm = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-
+  const router = useRouter();
   const form = useForm<InvoiceInput>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: {
@@ -140,8 +142,8 @@ const CreateInvoiceForm = () => {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "/api/invoices",
-        { ...values, status: "SENT" },
+        "/api/send/invoices",
+        { ...values, status: "Sent" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -156,11 +158,12 @@ const CreateInvoiceForm = () => {
       const token = localStorage.getItem("token");
       await axios.post(
         "/api/invoices",
-        { ...form.getValues(), status: "DRAFT" },
+        { ...form.getValues(), status: "Draft" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       Swal.fire("Saved", "Draft saved", "success");
+      router.push("/invoices")
     } catch {
       Swal.fire("Error", "Failed to save draft", "error");
     }
@@ -241,36 +244,35 @@ const CreateInvoiceForm = () => {
 
         {/* CLIENT */}
         <FormField
-  name="clientId"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Bill To</FormLabel>
-      <Select
-        value={field.value}
-        onValueChange={(value) => {
-          field.onChange(value);
+          name="clientId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Bill To</FormLabel>
+              <Select
+                value={field.value}
+                onValueChange={(value) => {
+                  field.onChange(value);
 
-          const client = clients.find((c) => c._id === value) || null;
-          setSelectedClient(client);
-        }}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select client" />
-        </SelectTrigger>
-        <SelectContent>
-          {clients.map((c) => (
-            <SelectItem key={c._id} value={c._id}>
-              {c.clientName}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </FormItem>
-  )}
-/>
+                  const client = clients.find((c) => c._id === value) || null;
+                  setSelectedClient(client);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select client" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clients.map((c) => (
+                    <SelectItem key={c._id} value={c._id}>
+                      {c.clientName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormItem>
+          )}
+        />
 
-<BilledToClientDetails selectedClientDetails={selectedClient} />
-
+        <BilledToClientDetails selectedClientDetails={selectedClient} />
 
         {/* ITEMS */}
         <section className="space-y-4">
@@ -319,7 +321,6 @@ const CreateInvoiceForm = () => {
         </section>
 
         {/* DISCOUNT & TAX */}
-        {/* DISCOUNT & TAX */}
         <section className="space-y-4">
           <h2 className="text-lg font-semibold">Discount & Tax</h2>
 
@@ -344,6 +345,41 @@ const CreateInvoiceForm = () => {
               )}
             />
           </div>
+        </section>
+
+        {/* DESCRIPTION & TERMS */}
+        <section className="space-y-6">
+          <h2 className="text-lg font-semibold">Additional Details</h2>
+
+          {/* DESCRIPTION */}
+          <FormField
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <Textarea
+                  {...field}
+                  placeholder="Add a short description or note for this invoice"
+                  className="min-h-[90px]"
+                />
+              </FormItem>
+            )}
+          />
+
+          {/* TERMS & CONDITIONS */}
+          <FormField
+            name="termsAndConditions"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Terms & Conditions</FormLabel>
+                <Textarea
+                  {...field}
+                  placeholder="Enter payment terms, late fee policy, etc."
+                  className="min-h-[120px]"
+                />
+              </FormItem>
+            )}
+          />
         </section>
 
         {/* TOTAL */}

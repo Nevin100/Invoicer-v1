@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -102,21 +103,20 @@ const InvoicePage = () => {
           const discountAmount = (inv.discount / 100) * totalAmount;
           const taxAmount = (inv.tax / 100) * totalAmount;
 
-          const finalAmount = totalAmount - discountAmount + taxAmount;
-
           return {
-            id: inv._id,
-            name: inv.client?.clientName || "N/A",
-            email: inv.client?.email || "N/A",
-            invoiceNo: inv.invoiceNumber,
-            description: inv.description,
-            status: inv.status || "Pending",
-            amount: finalAmount,
-            itemsCount: inv.items?.length || 0,
-            rawInvoice: inv,
-            date: new Date(inv.issueDate).toLocaleDateString(),
-            dueDate: new Date(inv.dueDate).toLocaleDateString(),
-          };
+  id: inv._id,
+  name: inv.client?.clientName || "N/A",
+  email: inv.client?.email || "N/A",
+  invoiceNo: inv.invoiceNumber,
+  description: inv.description,
+  status: inv.status || "Draft",
+  amount: inv.totalAmount, // ✅ DIRECT
+  itemsCount: inv.items?.length || 0,
+  rawInvoice: inv,
+  date: new Date(inv.issueDate).toLocaleDateString(),
+  dueDate: new Date(inv.dueDate).toLocaleDateString(),
+};
+
         });
 
         setInvoices(transformedInvoices);

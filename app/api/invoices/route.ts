@@ -53,7 +53,7 @@ export async function POST(req: Request) {
       isRecurring: validated.isRecurring,
       recurringPeriod: validated.recurringPeriod,
 
-      status: status ?? "DRAFT",
+      status: status ?? "Draft",
     });
 
     return NextResponse.json(invoice, { status: 201 });
