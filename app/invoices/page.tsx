@@ -239,8 +239,9 @@ const InvoicePage = () => {
             onChange={(e) => setSelectedStatus(e.target.value)}
           >
             <option value="All">All status</option>
+            <option value="Paid">Draft</option>
             <option value="Paid">Paid</option>
-            <option value="Pending">Pending</option>
+            <option value="Pending">Sent</option>
             <option value="Overdue">Overdue</option>
           </select>
         </div>
