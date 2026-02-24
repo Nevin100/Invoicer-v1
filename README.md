@@ -5,12 +5,7 @@
 />
 </p>
 
-## 🚀 Live Demo
-
-🌐 https://invoicer-taupe.vercel.app/login  
-📦 https://github.com/Nevin100/Invoicer-v1  
-
-> ⚡ A modern full-stack invoice & finance management platform  
+> ⚡ A modern full-stack + GenAI - invoice & finance management platform  
 > 🚧 Currently ~85% complete and under active development
 
 ---
