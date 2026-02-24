@@ -1,156 +1,175 @@
-# 🧾 Invoicer v1  
-<img width="1366" height="607" alt="image" src="https://github.com/user-attachments/assets/ead70ada-6964-4147-84bc-dc65c4673ffa" className="align-center"/>
+# 🧾 Invoicer v1
 
-**Invoicer v1** is a modern, full-stack **monolithic invoice and finance management platform**, currently under active development and approximately **80–85% complete**.
+<p align="center">
+  <img width="1356" height="599" alt="image" src="https://github.com/user-attachments/assets/bc45767c-6e3d-4e3b-abb4-8f2675c35aa4" />
+/>
+</p>
 
-The platform is designed to help individuals, freelancers, and small businesses manage **invoices, expenses, clients, payments, and analytics** from responsive dashboards.
+## 🚀 Live Demo
 
-> 🚧 **Status:** Actively under development  
-> 🌐 **Live Demo:** https://invoicer-taupe.vercel.app/login  
-> 📦 **Repository:** https://github.com/Nevin100/Invoicer-v1  
+🌐 https://invoicer-taupe.vercel.app/login  
+📦 https://github.com/Nevin100/Invoicer-v1  
 
----
-
-## 🚀 Project Overview
-
-Invoicer v1 aims to become a **complete financial operating system** for businesses by combining:
-
-- Invoice lifecycle management
-- Expense tracking & analytics
-- Secure online payments
-- Data exports & reporting
-- Advanced authentication & authorization
-- AI-powered financial insights (planned)
+> ⚡ A modern full-stack invoice & finance management platform  
+> 🚧 Currently ~85% complete and under active development
 
 ---
 
-## 🏗️ Architecture
+# 📌 Overview
 
-- **Project Type:** Monolithic Full-Stack Application  
-- **Framework:** Next.js (App Router)  
-- **Database:** MongoDB (Mongoose ODM)  
-- **Deployment:** Vercel  
-- **Authentication:** JWT (OAuth planned)
+**Invoicer v1** is a production-structured financial management system designed for freelancers, startups, and small businesses.
+
+It provides a complete workflow for:
+
+- Invoice lifecycle management  
+- Expense tracking & categorization  
+- Client management  
+- Secure online payments  
+- Financial analytics dashboard  
+- Structured data exports  
+
+The architecture is designed to evolve into a scalable SaaS-ready financial operating system.
 
 ---
 
-## 📊 Current Development Status (IMPORTANT)
+# 🏗️ Architecture
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Next.js (App Router), React, TypeScript |
+| Backend | Next.js API Routes |
+| Database | MongoDB + Mongoose |
+| State Management | Redux Toolkit |
+| Validation | Zod |
+| Authentication | JWT |
+| Payments | Razorpay |
+| Deployment | Vercel |
+
+---
+
+# 📊 Development Status
 
 | Module | Status |
-|------|------|
+|--------|--------|
 | Authentication (JWT) | ✅ Completed |
-| Dashboard UI & Layout | ✅ Completed |
-| Financial Analytics | ✅ Completed |
+| Dashboard UI | ✅ Completed |
 | Expense Management | ✅ Completed |
-| Razorpay Payment Integration | ✅ Completed |
-| Excel Export (Expenses / Data) | ✅ Completed |
-| Invoice Creation | 🚧 In Progress |
+| Client Management | ✅ Completed |
+| Razorpay Integration | ✅ Completed |
+| Excel Export | ✅ Completed |
+| Financial Analytics | ✅ Completed |
+| Invoice Creation | ✅ Completed |
 | Invoice Emailing | 🚧 In Progress |
-| Inventory & Surplus Management | 🚧 In Progress |
-| Advanced Authorization (RBAC) | 🔜 Planned |
-| Google & Microsoft OAuth | 🔜 Planned |
-| AI / ML Financial Insights | 🔜 Planned |
-
-📌 **Overall Completion:** ~80–85%
-
----
-## 📷 ScreenShots : 
-<img width="1366" height="607" alt="image" src="https://github.com/user-attachments/assets/ead70ada-6964-4147-84bc-dc65c4673ffa" />
-<img width="1354" height="604" alt="image" src="https://github.com/user-attachments/assets/032f8228-ae60-4eff-b568-1f14ed7aaa33" />
-<img width="1360" height="614" alt="image" src="https://github.com/user-attachments/assets/9d6ef68d-53b0-4e38-837b-0d71a1edf509" />
-<img width="1366" height="604" alt="image" src="https://github.com/user-attachments/assets/b80437b8-20df-4cf9-be8e-99547aaeec46" />
-<img width="1366" height="602" alt="image" src="https://github.com/user-attachments/assets/83526aaf-20a8-417a-a077-6dc2b0ff2196" />
-<img width="1355" height="603" alt="image" src="https://github.com/user-attachments/assets/0b660336-7869-4bfa-8c6c-e92ae029630b" />
-<img width="1366" height="606" alt="image" src="https://github.com/user-attachments/assets/2b159f3a-7d25-4aea-91ed-a906a8e93e52" />
-<img width="1353" height="557" alt="image" src="https://github.com/user-attachments/assets/7212db49-16e1-417b-b582-64f7f1ced0b0" />
+| Inventory Management | 🚧 In Progress |
+| RBAC | 🔜 Planned |
+| OAuth Integration | 🔜 Planned |
+| AI Insights | 🔜 Planned |
+| AI Report Generation | 🔜 Planned |
+| SAAS Service Credit System + Services Launc | 🔜 Planned and 🚧 In progress |
 
 
-## ✨ Key Features (Implemented)
-
-### 🧾 Invoice Management
-- Create and manage invoices
-- Multiple billing categories
-- Client-linked invoices
-- Invoice emailing (in progress)
+**Overall Completion:** ~85%
 
 ---
 
-### 💸 Expense Management
-- Add, edit & delete expenses
-- Category-based tracking
-- Monthly financial aggregation
-- Top spending category insights
-
----
-
-### 💳 Payments (Razorpay Integration)
-- Secure online payments using **Razorpay**
-- Payment flow integrated into invoice lifecycle
-- Payment status handling (success / failure)
-
----
-
-### 📊 Financial Analytics Dashboard
-- Interactive charts (Clients vs Expenses)
-- Monthly & yearly trends
-- Clean loaders & empty states
-- Real-time aggregated insights
-
----
-
-### 📤 Data Export
-- Export expenses & financial data to **Excel**
-- Useful for accounting, auditing & reporting
-- Structured spreadsheet output
-
----
-
-### 👥 Client Management
-- Add, update & delete clients
-- Client-linked expenses & invoices
-- Customer statistics & growth trends
-
----
-
-### 📱 Responsive UI
-- Fully responsive across:
-  - Mobile
-  - Tablet
-  - Desktop
-- Sidebar-based navigation
-- Clean, modern dashboard layout
-
----
+# ✨ Features
 
 ## 🔐 Authentication & Security
 
-### Current
 - JWT-based authentication
+- Password hashing using bcrypt
 - Secure API routes
 - User-scoped database access
-
-### Planned
-- Google OAuth
-- Microsoft OAuth
-- Role-based access control (RBAC)
-- Advanced session handling
+- Zod schema validation
+- Middleware protection
 
 ---
 
-## 🤖 AI & Machine Learning (Future Scope)
+## 👥 Client Management
 
-The project is being developed with **AI-first thinking**:
-
-- Gemini is currently used during development
-- Planned **custom ML models** for:
-  - Automatic expense categorization
-  - Spending pattern analysis
-  - Financial anomaly detection
-  - Predictive insights for cash flow
+- Add, edit, delete clients
+- Client-linked invoices
+- Client-linked expenses
+- Structured relational references
 
 ---
 
-## 🛠️ Tech Stack
+## 💸 Expense Management
+
+- Add / edit / delete expenses
+- Category-based tracking
+- Date-based filtering
+- Monthly aggregation logic
+- Top spending category detection
+- Dashboard integration
+- Excel export functionality
+
+---
+
+## 🧾 Invoice System
+
+- Dynamic invoice creation
+- Auto-filled client billing section
+- Multiple line items
+- Tax & discount calculations
+- Recurring invoice flag support
+- Automatic invoice number generation
+- Payment status tracking (Paid / Pending)
+
+---
+
+## 💳 Razorpay Payment Integration
+
+- Secure order creation
+- Payment verification
+- Success & failure handling
+- Invoice status auto-update
+
+---
+
+## 📊 Financial Analytics
+
+- Monthly expense trends
+- Client growth metrics
+- Aggregated totals
+- Interactive charts (Recharts)
+- Responsive dashboard
+- Skeleton loaders & empty states
+
+---
+
+## 📤 Data Export
+
+- Export expenses to Excel
+- Structured spreadsheet output
+- Accounting-ready formatting
+
+---
+
+## 📱 Responsive Design
+
+- Mobile-first layout
+- Sidebar navigation system
+- Adaptive dashboards
+- Optimized for Desktop / Tablet / Mobile
+
+---
+
+# 🤖 Future Scope (AI-First Vision)
+
+Planned AI capabilities:
+
+- Automatic expense categorization
+- Spending pattern analysis
+- Financial anomaly detection
+- Predictive cash-flow insights
+- Intelligent invoice reminders
+
+Goal: Transform Invoicer into a smart financial assistant.
+
+---
+
+# 🛠️ Tech Stack
 
 ### Frontend
 - Next.js
@@ -166,20 +185,32 @@ The project is being developed with **AI-first thinking**:
 - MongoDB
 - Mongoose
 - JWT
-- Zod (Validation)
+- Zod
+- Bcrypt
 
-### Utilities & Tools
-- Axios
+### State & Utilities
 - Redux Toolkit
 - React Hook Form
+- Axios
 - ExcelJS
 - File Saver
 - Date-Fns
-- Bcrypt
 
 ---
 
-## ⚙️ Installation & Setup
+# 📷 Images:
+<img width="1366" height="599" alt="image" src="https://github.com/user-attachments/assets/950cb16e-4cf6-4e90-86db-059e67f4bada" />
+<img width="1366" height="598" alt="image" src="https://github.com/user-attachments/assets/5262818b-0e42-44b4-8cc2-3578fbc330cc" />
+<img width="1364" height="603" alt="image" src="https://github.com/user-attachments/assets/5f28cda6-766b-472a-8f3a-a5396cc0d548" />
+<img width="1360" height="613" alt="image" src="https://github.com/user-attachments/assets/8d0ddd53-e849-4453-bb0f-fdc12714e6f8" />
+<img width="1365" height="605" alt="image" src="https://github.com/user-attachments/assets/2c453f40-6b27-41eb-b90e-6764e6c6ec97" />
+<img width="1366" height="603" alt="image" src="https://github.com/user-attachments/assets/7337e104-07f5-4475-bc74-9615146e2a78" />
+<img width="1366" height="594" alt="image" src="https://github.com/user-attachments/assets/9cb7f1ab-75a5-4908-8c1e-9eefd3547182" />
+<img width="1366" height="604" alt="image" src="https://github.com/user-attachments/assets/2d402da8-4c1c-4373-8764-6c020a22521b" />
+<img width="1357" height="610" alt="image" src="https://github.com/user-attachments/assets/4b1878d5-0335-4819-8bf8-86817234f464" />
+
+
+# ⚙️ Installation & Setup
 
 ```bash
 # Clone repository
@@ -191,6 +222,6 @@ cd Invoicer-v1
 # Install dependencies
 npm install
 
-# Run development server
+# Create.env file then paste the redentials required and then run 
 npm run dev
 ```
