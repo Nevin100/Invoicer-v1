@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+// validations :
+
 //Signup Schema Validation : 
 export const signupSchema = z.object({
   username: z.string().min(3, "Username must be at least 5 characters"),
