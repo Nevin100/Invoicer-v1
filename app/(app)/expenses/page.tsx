@@ -36,20 +36,25 @@ const Expense = () => {
   });
 
   useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get<any>("/api/expenses", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setExpenses(res.data.expenses);
-        setMetrics(res.data.stats);
-      } catch (error) {
-        console.error("Failed to fetch expenses:", error);
+  const fetchExpenses = async () => {
+    try {
+      const res = await axios.get<any>("/api/expenses", {
+        withCredentials: true,
+      });
+
+      setExpenses(res.data.expenses);
+      setMetrics(res.data.stats);
+
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        window.location.href = "/login";
       }
-    };
-    fetchExpenses();
-  }, []);
+      console.error("Failed to fetch expenses:", error);
+    }
+  };
+
+  fetchExpenses();
+}, []);
 
   const filteredExpenses = expenses.filter((expense) => {
     const q = query.toLowerCase();
@@ -95,38 +100,44 @@ const Expense = () => {
   }, [selected, filteredExpenses]);
 
   const deleteSelectedExpenses = async () => {
-    if (selected.length === 0) {
-      Swal.fire({ title: "No Expenses selected!", icon: "warning" });
-      return;
+  if (selected.length === 0) {
+    Swal.fire({ title: "No Expenses selected!", icon: "warning" });
+    return;
+  }
+
+  const { isConfirmed } = await Swal.fire({
+    title: "Are you sure?",
+    text: "You want to delete selected expenses?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#ef4444",
+    confirmButtonText: "Yes, delete!",
+  });
+
+  if (!isConfirmed) return;
+
+  try {
+    const expenseIds = filteredExpenses
+      .filter((_, i) => selected.includes(i))
+      .map((exp) => exp._id);
+
+    await axios.delete("/api/expenses", {
+      withCredentials: true,
+      data: { expenseIds },
+    } as any);
+
+    Swal.fire("Deleted!", "Expenses removed.", "success");
+
+    setExpenses(prev => prev.filter(exp => !expenseIds.includes(exp._id)));
+    setSelected([]);
+
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      window.location.href = "/login";
     }
-
-    const { isConfirmed } = await Swal.fire({
-      title: "Are you sure?",
-      text: "You want to delete selected expenses?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#ef4444",
-      confirmButtonText: "Yes, delete!",
-    });
-
-    if (!isConfirmed) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const expenseIds = filteredExpenses.filter((_, i) => selected.includes(i)).map((exp) => exp._id);
-      
-      await axios.delete("/api/expenses", {
-        headers: { Authorization: `Bearer ${token}` },
-        data: { expenseIds },
-      } as any);
-
-      Swal.fire("Deleted!", "Expenses removed.", "success");
-      setExpenses(prev => prev.filter(exp => !expenseIds.includes(exp._id)));
-      setSelected([]);
-    } catch (error) {
-      Swal.fire("Error", "Delete failed", "error");
-    }
-  };
+    Swal.fire("Error", "Delete failed", "error");
+  }
+};
 
   const handleExport = () => {
     const workbook = new ExcelJS.Workbook();

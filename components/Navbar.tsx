@@ -7,29 +7,34 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
-const getUsernameFromToken = () => {
-  if (typeof window === "undefined") return "Guest";
-  const token = localStorage.getItem("token");
-  if (!token) return "Guest";
-  try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const payload = JSON.parse(atob(base64));
-    return payload.username || "Admin";
-  } catch (error) {
-    console.error(`Error decoding token: ${error}`);
-    return "Guest";
-  }
-};
-
 const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [username, setUsername] = useState("Guest");
+  const [loadingUser, setLoadingUser] = useState(true);
 
   useEffect(() => {
-    setUsername(getUsernameFromToken());
-  }, []);
+  const fetchUser = async () => {
+    try {
+      const res = await fetch("/api/auth/me", {
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setUsername(data.user.username || "User");
+      } else {
+        setUsername("Guest");
+      }
+    } catch {
+      setUsername("Guest");
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+
+  fetchUser();
+}, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

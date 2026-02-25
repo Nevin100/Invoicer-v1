@@ -15,14 +15,10 @@ export default function BilledToClientDetails({
     return (
       <Card className="w-full min-h-[150px] rounded-2xl px-6 py-4 bg-[#FBFCFE]">
         <CardHeader>
-          <CardTitle className="text-[#532B88] text-xl">
-            Billed To
-          </CardTitle>
+          <CardTitle className="text-[#532B88] text-xl">Billed To</CardTitle>
         </CardHeader>
         <CardContent className="flex justify-center items-center">
-          <p className="italic text-muted-foreground">
-            No client selected
-          </p>
+          <p className="italic text-muted-foreground">No client selected</p>
         </CardContent>
       </Card>
     );
@@ -44,9 +40,7 @@ export default function BilledToClientDetails({
   return (
     <Card className="w-full rounded-2xl px-6 py-4 bg-[#FBFCFE]">
       <CardHeader>
-        <CardTitle className="text-[#532B88] text-xl">
-          Billed To
-        </CardTitle>
+        <CardTitle className="text-[#532B88] text-xl">Billed To</CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -63,18 +57,14 @@ export default function BilledToClientDetails({
         {/* ADDRESS */}
         {(address || state || country) && (
           <blockquote className="border-l-2 pl-4 italic text-sm text-gray-700">
-            {[address, state, country, postal]
-              .filter(Boolean)
-              .join(", ")}
+            {[address, state, country, postal].filter(Boolean).join(", ")}
           </blockquote>
         )}
 
         {/* EMAIL */}
         {email && (
           <div className="flex text-sm">
-            <span className="text-muted-foreground mr-2">
-              Email:
-            </span>
+            <span className="text-muted-foreground mr-2">Email:</span>
             <span>{email}</span>
           </div>
         )}
@@ -82,9 +72,7 @@ export default function BilledToClientDetails({
         {/* PHONE */}
         {mobile && (
           <div className="flex text-sm">
-            <span className="text-muted-foreground mr-2">
-              Phone:
-            </span>
+            <span className="text-muted-foreground mr-2">Phone:</span>
             <span className="mr-1">{countryTelephoneCode}</span>
             <span>{mobile}</span>
           </div>

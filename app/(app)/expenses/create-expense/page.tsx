@@ -19,52 +19,55 @@ const Page = () => {
   const expense = useSelector((state: any) => state.expense);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
-    const { amount, currency, category, description, date } = expense;
+const handleSubmit = async () => {
+  const { amount, currency, category, description, date } = expense;
 
-    if (!amount || !category || !description || !currency || !date) {
+  if (!amount || !category || !description || !currency || !date) {
+    Swal.fire({
+      title: "Missing Fields",
+      text: "Bhai, saari details bharna zaroori hai!",
+      icon: "warning",
+      confirmButtonColor: "#4f46e5",
+    });
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    const res = await fetch("/api/expenses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(expense),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
       Swal.fire({
-        title: "Missing Fields",
-        text: "Bhai, saari details bharna zaroori hai!",
-        icon: "warning",
+        title: "Added!",
+        text: "Expense record create ho gaya hai.",
+        icon: "success",
         confirmButtonColor: "#4f46e5",
       });
-      return;
+
+      dispatch(resetExpense());
+    } else if (res.status === 401) {
+      window.location.href = "/login";
+    } else {
+      Swal.fire("Error", data.error || "Kuch gadbad ho gayi!", "error");
     }
 
-    setIsSubmitting(true);
-    const token = localStorage.getItem("token");
-
-    try {
-      const res = await fetch("/api/expenses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(expense),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        Swal.fire({
-          title: "Added!",
-          text: "Expense record create ho gaya hai.",
-          icon: "success",
-          confirmButtonColor: "#4f46e5",
-        });
-        dispatch(resetExpense());
-      } else {
-        Swal.fire("Error", data.message || "Kuch gadbad ho gayi!", "error");
-      }
-    } catch (error) {
-      console.log(error);
-      Swal.fire("Error", "Network problem!", "error");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  } catch (error) {
+    console.log(error);
+    Swal.fire("Error", "Network problem!", "error");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="relative w-full min-h-screen flex items-center justify-center bg-[#fcfbf7] px-4 py-10 overflow-hidden">

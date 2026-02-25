@@ -37,14 +37,9 @@ const ExpensesChart = () => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          setLoading(false);
-          return;
-        }
 
         const res = await fetch("/api/expenses", {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
         });
 
         if (!res.ok) throw new Error("Failed to fetch");

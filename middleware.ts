@@ -1,31 +1,42 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
-export function middleware(req: NextRequest) {
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
-  // Public Routes
-  const publicRoutes = ["/login", "/signup"];
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
 
-  // Private Routes
-  const privateRoutes = ["/", "/expenses", "/invoices", "/payments", "/reports", "/settings"];
+  const publicRoutes = ["/", "/login", "/signup"];
+  const isPublic = publicRoutes.includes(pathname);
 
-  // // ✅ Agar user private route pe hai aur login nahi hai, toh login page pe redirect karo
-  // if (privateRoutes.includes(req.nextUrl.pathname) && !token) {
-  //   return NextResponse.redirect(new URL("/login", req.url));
-  // }
+  const token = req.cookies.get("token")?.value;
+  const googleSession = req.cookies.get("authjs.session-token")?.value;
 
-  // // ✅ Agar user logged in hai aur login ya signup pe ja raha hai, toh home page pe redirect karo
-  // if (publicRoutes.includes(req.nextUrl.pathname) && token) {
-  //   return NextResponse.redirect(new URL("/", req.url));
-  // }
+  const isAuthenticated = !!googleSession;
+
+  if (!token && !isAuthenticated && !isPublic) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+  
+  if (token) {
+    try {
+      await jwtVerify(token, JWT_SECRET);
+    } catch {
+      const res = NextResponse.redirect(new URL("/login", req.url));
+      res.cookies.set("token", "", { maxAge: 0 });
+      return res;
+    }
+  }
+
+  if ((token || isAuthenticated) &&
+    (pathname === "/login" || pathname === "/signup")) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/expenses", "/invoices", "/payments", "/reports", "/settings", "/login", "/signup"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
 };
-
-

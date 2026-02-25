@@ -7,7 +7,7 @@ const Loading = ({ delay = 3000 }) => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("hasLoaded") ? false : true;
     }
-    return true; // Default to true during SSR
+    return true;
   });
 
   useEffect(() => {

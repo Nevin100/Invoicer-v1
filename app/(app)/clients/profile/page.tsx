@@ -40,16 +40,17 @@ const ClientProfileContent = () => {
 
   useEffect(() => {
     const fetchAllData = async () => {
-      const token = localStorage.getItem("token");
-      const headers = { Authorization: `Bearer ${token}` };
-
       try {
-        const res = await axios.get<Client[]>("/api/clients", { headers });
+        const res = await axios.get<Client[]>("/api/clients", { 
+          withCredentials: true,
+         });
         setClients(res.data);
         setFilteredClients(res.data);
 
         if (id) {
-          const clientRes = await axios.get(`/api/clients/${id}`, { headers });
+          const clientRes = await axios.get(`/api/clients/${id}`, { 
+            withCredentials: true,  
+           });
           setClient(clientRes.data as Client);
         }
       } catch (err) {
@@ -96,12 +97,10 @@ const ClientProfileContent = () => {
 
     if (isConfirmed) {
       try {
-        const token = localStorage.getItem("token");
-        // FIX: Object literal may only specify known properties fix
         await axios.request({
           url: "/api/clients",
           method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
           data: { clientIds: selectedClients }
         });
         setClients(clients.filter(c => !selectedClients.includes(c._id)));

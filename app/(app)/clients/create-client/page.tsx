@@ -26,13 +26,12 @@ export default function NewClientForm() {
   const handleSubmit = async () => {
     setLoading(true)
     try {
-      const token = localStorage.getItem("token")
       const res = await fetch("/api/clients", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(client),
       })
 

@@ -1,7 +1,6 @@
 "use client";
 
 import ClientLayout from "./client-layout";
-import AuthGuard from "@/components/AuthGuard";
 
 export default function AppLayout({
   children,
@@ -10,7 +9,7 @@ export default function AppLayout({
 }) {
   return (
     <ClientLayout>
-      <AuthGuard>{children}</AuthGuard>
+      {children}
     </ClientLayout>
   );
 }

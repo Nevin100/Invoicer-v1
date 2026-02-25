@@ -8,7 +8,6 @@ const InvoiceDetailsModal = ({ invoice, onClose }: Props) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center">
       <div className="bg-white w-full sm:max-w-4xl h-[90vh] sm:h-auto sm:max-h-[85vh] rounded-t-2xl sm:rounded-2xl shadow-xl flex flex-col overflow-hidden">
-
         {/* HEADER (Sticky) */}
         <div className="sticky top-0 z-10 bg-white border-b px-5 py-4 flex justify-between items-center">
           <div>
@@ -30,12 +29,14 @@ const InvoiceDetailsModal = ({ invoice, onClose }: Props) => {
 
         {/* BODY */}
         <div className="flex-1 overflow-y-auto px-5 py-6 space-y-8">
-
           {/* META INFO */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
             <Info label="Issue Date" value={invoice.issueDate} />
             <Info label="Due Date" value={invoice.dueDate} />
-            <Info label="Recurring" value={invoice.isRecurring ? "Yes" : "No"} />
+            <Info
+              label="Recurring"
+              value={invoice.isRecurring ? "Yes" : "No"}
+            />
             <Info label="Period" value={invoice.recurringPeriod || "—"} />
           </div>
 
@@ -84,9 +85,7 @@ const InvoiceDetailsModal = ({ invoice, onClose }: Props) => {
                       Qty {item.quantity} × ₹{item.rate}
                     </p>
                   </div>
-                  <p className="font-semibold">
-                    ₹{item.quantity * item.rate}
-                  </p>
+                  <p className="font-semibold">₹{item.quantity * item.rate}</p>
                 </div>
               ))}
             </div>
@@ -141,9 +140,7 @@ const Info = ({ label, value }: { label: string; value: any }) => (
   <div>
     <p className="text-gray-500">{label}</p>
     <p className="font-medium">
-      {value instanceof Date
-        ? value.toLocaleDateString()
-        : value}
+      {value instanceof Date ? value.toLocaleDateString() : value}
     </p>
   </div>
 );

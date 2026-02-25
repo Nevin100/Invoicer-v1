@@ -1,8 +1,24 @@
-"use client";
-
-import { Provider } from "react-redux";
-import { store } from "@/lib/redux/store";
+// app/layout.tsx
+import type { Metadata } from "next";
+import ReduxProvider from "@/lib/redux/ReduxProvider";
 import "./globals.css";
+
+export const metadata: Metadata = {
+  title: {
+    default: "Invoicer — Smart Invoicing for Everyone",
+    template: "%s | Invoicer", 
+  },
+  description:
+    "Create, manage, and track professional invoices powered by AI. Built for freelancers, agencies, and growing businesses.",
+  keywords: ["invoice", "invoicing", "AI invoice", "billing", "SaaS"],
+  authors: [{ name: "Nevin Bali" }],
+  metadataBase: new URL("https://www.nevinbali.me"),
+  openGraph: {
+    title: "Invoicer — Smart Invoicing for Modern Teams",
+    description: "AI-powered invoicing platform for modern businesses.",
+    type: "website",
+  },
+};
 
 export default function RootLayout({
   children,
@@ -12,9 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Provider store={store}>
-          {children}
-        </Provider>
+        <ReduxProvider>{children}</ReduxProvider>
       </body>
     </html>
   );

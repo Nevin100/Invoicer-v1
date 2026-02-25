@@ -27,7 +27,20 @@ type ExpensesResponse = {
   }>;
 };
 
-const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 const FinancialAnalytics = () => {
   const [data, setData] = useState<ChartData[]>([]);
@@ -36,19 +49,17 @@ const FinancialAnalytics = () => {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const token = localStorage.getItem("token");
-
         const [clientsRes, expensesRes] = await Promise.all([
-          axios.get<any[]>("/api/clients", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get<ExpensesResponse>("/api/expenses", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          fetch("/api/clients", { credentials: "include" }).then((res) =>
+            res.json(),
+          ),
+          fetch("/api/expenses", { credentials: "include" }).then((res) =>
+            res.json(),
+          ),
         ]);
 
-        const clients = clientsRes.data;
-        const expenses = expensesRes.data.expenses;
+        const clients = clientsRes;
+        const expenses = expensesRes.expenses;
 
         const clientMap: Record<string, number> = {};
         const expenseMap: Record<string, number> = {};
@@ -67,9 +78,10 @@ const FinancialAnalytics = () => {
           const datePart = e.date.split(",")[0];
           const [day, monthNum] = datePart.split("-");
 
-          const month = new Date(
-            `2025-${monthNum}-${day}`
-          ).toLocaleString("en-US", { month: "short" });
+          const month = new Date(`2025-${monthNum}-${day}`).toLocaleString(
+            "en-US",
+            { month: "short" },
+          );
 
           const amount = Number(e.amount.replace(/[^\d.]/g, ""));
 
@@ -95,43 +107,43 @@ const FinancialAnalytics = () => {
   }, []);
 
   /* Loading State */
-if (loading) {
-  return (
-    <div className="bg-white border border-[#e8e8e8] rounded-[16px] h-[410px] md:h-[440px] flex items-center justify-center">
-      <div className="flex items-center gap-4">
-        {/* Spinner */}
-        <div className="relative w-10 h-10">
-          {/* Outer circle */}
-          <div className="absolute inset-0 rounded-full border-4 border-blue-200 animate-spin" />
-          {/* Inner circle */}
-          <div className="absolute inset-2 rounded-full bg-[#0052CC] animate-ping" />
-        </div>
+  if (loading) {
+    return (
+      <div className="bg-white border border-[#e8e8e8] rounded-[16px] h-[410px] md:h-[440px] flex items-center justify-center">
+        <div className="flex items-center gap-4">
+          {/* Spinner */}
+          <div className="relative w-10 h-10">
+            {/* Outer circle */}
+            <div className="absolute inset-0 rounded-full border-4 border-blue-200 animate-spin" />
+            {/* Inner circle */}
+            <div className="absolute inset-2 rounded-full bg-[#0052CC] animate-ping" />
+          </div>
 
-        {/* Text */}
-        <p className="text-gray-600 text-sm">
-          Loading the graph...
-        </p>
+          {/* Text */}
+          <p className="text-gray-600 text-sm">Loading the graph...</p>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   /* 🈳 Empty State */
-  if (!loading && data.every(d => d.clients === 0 && d.expenses === 0)) {
+  if (!loading && data.every((d) => d.clients === 0 && d.expenses === 0)) {
     return (
       <div className="bg-white border border-[#e8e8e8] rounded-[16px] h-[410px] flex flex-col gap-4 items-center justify-center gap-3">
-        <p className="text-gray-700 text-xl">
-          No financial data yet
-        </p>
+        <p className="text-gray-700 text-xl">No financial data yet</p>
 
         <div className="flex gap-3">
-          <Link href={"/clients/create-client"}
-           className="bg-[#172B4D] text-white px-4 py-2 rounded-md text-sm">
+          <Link
+            href={"/clients/create-client"}
+            className="bg-[#172B4D] text-white px-4 py-2 rounded-md text-sm"
+          >
             Add New Client
-          </Link>          
-         
-          <Link href={"/expenses/create-expense"}
-         className="bg-[#0052CC] text-white px-4 py-2 rounded-md text-sm">
+          </Link>
+
+          <Link
+            href={"/expenses/create-expense"}
+            className="bg-[#0052CC] text-white px-4 py-2 rounded-md text-sm"
+          >
             Add New Expense
           </Link>
         </div>

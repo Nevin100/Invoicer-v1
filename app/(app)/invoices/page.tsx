@@ -69,44 +69,58 @@ const InvoicePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const res = await axios.get<any>("/api/invoices", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        const rawData = res.data as any[];
-        const transformedInvoices: Invoice[] = rawData.map((inv: any) => ({
-          id: inv._id,
-          name: inv.client?.clientName || "N/A",
-          email: inv.client?.email || "N/A",
-          invoiceNo: inv.invoiceNumber,
-          description: inv.description,
-          status: inv.status || "Draft",
-          amount: inv.totalAmount,
-          itemsCount: inv.items?.length || 0,
-          rawInvoice: inv,
-          date: new Date(inv.issueDate).toLocaleDateString(),
-          dueDate: new Date(inv.dueDate).toLocaleDateString(),
-        }));
+  const fetchInvoices = async () => {
+    try {
+      const res = await axios.get<any>("/api/invoices", {
+        withCredentials: true, 
+      });
 
-        setInvoices(transformedInvoices);
-        setLoading(false);
+      const rawData = res.data as any[];
 
-        const totalPayment = transformedInvoices.reduce((acc, curr) => acc + curr.amount, 0);
-        const outstanding = transformedInvoices.filter((i) => i.status !== "Paid");
+      const transformedInvoices: Invoice[] = rawData.map((inv: any) => ({
+        id: inv._id,
+        name: inv.client?.clientName || "N/A",
+        email: inv.client?.email || "N/A",
+        invoiceNo: inv.invoiceNumber,
+        description: inv.description,
+        status: inv.status || "Draft",
+        amount: inv.totalAmount,
+        itemsCount: inv.items?.length || 0,
+        rawInvoice: inv,
+        date: new Date(inv.issueDate).toLocaleDateString(),
+        dueDate: new Date(inv.dueDate).toLocaleDateString(),
+      }));
 
-        setMetrics({
-          totalInvoices: transformedInvoices.length,
-          totalPayment,
-          outstandingInvoices: outstanding.length,
-          outstandingPayment: outstanding.reduce((acc, inv) => acc + inv.amount, 0),
-        });
-      } catch (error) {
-        setLoading(false);
-      }
-    };
-    fetchInvoices();
-  }, []);
+      setInvoices(transformedInvoices);
+
+      const totalPayment = transformedInvoices.reduce(
+        (acc, curr) => acc + curr.amount,
+        0
+      );
+
+      const outstanding = transformedInvoices.filter(
+        (i) => i.status !== "Paid"
+      );
+
+      setMetrics({
+        totalInvoices: transformedInvoices.length,
+        totalPayment,
+        outstandingInvoices: outstanding.length,
+        outstandingPayment: outstanding.reduce(
+          (acc, inv) => acc + inv.amount,
+          0
+        ),
+      });
+
+    } catch (error) {
+      console.error("Invoice fetch failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchInvoices();
+}, []);
 
   const handleSelectAll = () => {
     setSelectAll(!selectAll);

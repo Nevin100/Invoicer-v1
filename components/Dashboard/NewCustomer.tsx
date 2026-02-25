@@ -23,9 +23,8 @@ const NewCustomer = () => {
 
   const fetchCustomersStats = async () => {
     try {
-      const token = localStorage.getItem("token");
       const res = await axios.get<ClientStatsResponse>("/api/clients/stats", {
-        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
       });
       setData(res.data.chartData);
       setTotal(res.data.totalClients);

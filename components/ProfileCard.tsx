@@ -1,5 +1,3 @@
-// app/components/ProfileCard.tsx
-
 import ProfileHoverCardDemo from "./profile/profile-hover-card";
 
 interface ProfileCardProps {
@@ -22,18 +20,11 @@ const ProfileCard = ({ name, email, phone }: ProfileCardProps) => {
         {initials}
       </div>
 
-
-
-
       <section className="text-[17px]">
         <h1 className="font-semibold text-[24px] text-gray-900">{name}</h1>
         <ProfileHoverCardDemo infoName="Email:" val={email} />
         <ProfileHoverCardDemo infoName="Phone:" val={phone} />
       </section>
-
-
-
-
     </div>
   );
 };
