@@ -99,8 +99,7 @@ export default function Hero() {
                 <img
                   src="/girl.jpg"
                   alt="Invoicer Lifestyle"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover rounded-[2.2rem] shadow-inner transition-transform duration-[2s] group-hover:scale-105"
+                  className="w-full h-auto object-cover rounded-[2.2rem] shadow-inner transition-transform duration-[2s] group-hover:scale-105"
                 />
 
                 {/* Soft Bottom Fade for Image */}
