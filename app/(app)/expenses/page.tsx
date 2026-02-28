@@ -247,7 +247,7 @@ const Expense = () => {
                 <td className="p-6"><input type="checkbox" checked={selected.includes((currentPage - 1) * itemsPerPage + idx)} onChange={() => toggleCheckbox((currentPage - 1) * itemsPerPage + idx)} className="accent-indigo-600" /></td>
                 <td className="p-6 font-black italic text-slate-900 tracking-tight text-lg">{item.amount}</td>
                 <td className="p-6 text-sm font-bold text-slate-600 uppercase tracking-tighter">{item.category}</td>
-                <td className="p-6 text-xs font-bold text-slate-400">{new Date(item.date).toLocaleDateString()}</td>
+                <td className="p-6 text-xs font-bold text-slate-400">{item.date}</td>
                 <td className="p-6"><span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">Cleared</span></td>
               </tr>
             )) : (
@@ -271,7 +271,7 @@ const Expense = () => {
             <div className="space-y-1">
                <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{item.category}</p>
                <p className="text-xs font-bold text-slate-500 line-clamp-1">{item.description || "Personal Expense Record"}</p>
-               <p className="text-[10px] font-bold text-slate-300 pt-2">{new Date(item.date).toLocaleDateString()}</p>
+               <p className="text-[10px] font-bold text-slate-300 pt-2">{item.date}</p>
             </div>
           </div>
         ))}

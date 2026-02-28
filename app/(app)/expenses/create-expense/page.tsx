@@ -25,7 +25,28 @@ const handleSubmit = async () => {
   if (!amount || !category || !description || !currency || !date) {
     Swal.fire({
       title: "Missing Fields",
-      text: "Bhai, saari details bharna zaroori hai!",
+      text: "Fill all the required fields before submitting.",
+      icon: "warning",
+      confirmButtonColor: "#4f46e5",
+    });
+    return;
+  }
+
+  const parsedDate = new Date(date);
+  if (isNaN(parsedDate.getTime())) {
+    Swal.fire({
+      title: "Invalid Date",
+      text: "Please enter a valid date.",
+      icon: "warning",
+      confirmButtonColor: "#4f46e5",
+    });
+    return;
+  }
+
+  if (parsedDate > new Date()) {
+    Swal.fire({
+      title: "Future Date?",
+      text: "You cannot log an expense for a future date.",
       icon: "warning",
       confirmButtonColor: "#4f46e5",
     });
@@ -49,7 +70,7 @@ const handleSubmit = async () => {
     if (res.ok) {
       Swal.fire({
         title: "Added!",
-        text: "Expense record create ho gaya hai.",
+        text: "Expense record has been successfully created.",
         icon: "success",
         confirmButtonColor: "#4f46e5",
       });
@@ -58,7 +79,7 @@ const handleSubmit = async () => {
     } else if (res.status === 401) {
       window.location.href = "/login";
     } else {
-      Swal.fire("Error", data.error || "Kuch gadbad ho gayi!", "error");
+      Swal.fire("Error", data.error || "Internal Server Error", "error");
     }
 
   } catch (error) {

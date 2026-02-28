@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import ReduxProvider from "@/lib/redux/ReduxProvider";
 import "./globals.css";
 import AuthProvider from "@/lib/redux/AuthProvider";
+import {Toaster} from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: {
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Toaster />
         <ReduxProvider>
           <AuthProvider>{children}</AuthProvider>
         </ReduxProvider>

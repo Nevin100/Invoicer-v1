@@ -91,12 +91,6 @@ const RecentExpenses = () => {
       ) : (
         <div className="space-y-1 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
           {expenses.map((expense, index) => {
-            const formattedDate = new Date(expense.date).toLocaleDateString("en-IN", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            });
-
             return (
               <motion.div
                 initial={{ opacity: 0, y: 5 }}
@@ -114,7 +108,7 @@ const RecentExpenses = () => {
                     </p>
                     <div className="flex items-center gap-1.5 text-slate-400">
                       <Calendar size={10} strokeWidth={3} />
-                      <span className="text-[10px] font-bold uppercase tracking-widest">{formattedDate}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest">{expense.date}</span>
                     </div>
                   </div>
                 </div>
