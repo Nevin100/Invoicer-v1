@@ -25,11 +25,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             });
           }
           return true;
-        } catch {
+        } catch(error : any) {
+          console.error("Error during Google sign-in:", error);
           return false;
         }
       }
       return true;
+    },
+
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      if (url.startsWith(baseUrl)) return url;
+      return `${baseUrl}/dashboard`; 
     },
 
     async jwt({ token, user, account }) {

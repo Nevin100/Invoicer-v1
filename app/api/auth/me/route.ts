@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth"; 
+import { auth } from "@/auth";
 import { getAuthToken } from "@/lib/auth/cookies";
 import { verifyAuthToken } from "@/lib/auth/cookies";
 import User from "@/lib/models/User.model";
@@ -9,22 +9,25 @@ export async function GET() {
   try {
     const session = await auth();
     if (session?.user) {
+      await connectDB();
+      const user = await User.findOne({ email: session.user.email }).select(
+        "-password",
+      );
       return NextResponse.json({
         user: {
-          username: session.user.name,
+          username: user?.username || session.user.name,
           email: session.user.email,
           avatar: session.user.image,
         },
       });
     }
 
-    // Phir manual JWT check karo
     const token = await getAuthToken();
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const decoded = await verifyAuthToken(token) as any;
+    const decoded = (await verifyAuthToken(token)) as any;
     await connectDB();
     const user = await User.findById(decoded.userId).select("-password");
 
@@ -38,7 +41,6 @@ export async function GET() {
         email: user.email,
       },
     });
-
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

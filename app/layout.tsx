@@ -1,12 +1,12 @@
-// app/layout.tsx
 import type { Metadata } from "next";
 import ReduxProvider from "@/lib/redux/ReduxProvider";
 import "./globals.css";
+import AuthProvider from "@/lib/redux/AuthProvider";
 
 export const metadata: Metadata = {
   title: {
     default: "Invoicer — Smart Invoicing for Everyone",
-    template: "%s | Invoicer", 
+    template: "%s | Invoicer",
   },
   description:
     "Create, manage, and track professional invoices powered by AI. Built for freelancers, agencies, and growing businesses.",
@@ -28,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ReduxProvider>{children}</ReduxProvider>
+        <ReduxProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ReduxProvider>
       </body>
     </html>
   );
