@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { logoutSuccess } from "@/lib/redux/Features/authSlice";
 import { Badge } from "@/components/ui/badge";
 import { signOut } from "next-auth/react";
+import toast from "react-hot-toast";
 
 const Settings = () => {
   const router = useRouter();
@@ -16,23 +17,19 @@ const Settings = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async (): Promise<void> => {
-    setIsLoggingOut(true);
-    try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      dispatch(logoutSuccess());
-
-      await signOut({ callbackUrl: "/login" });
-    } catch {
-      dispatch(logoutSuccess());
-      await signOut({ callbackUrl: "/login" });
-    } finally {
-      setIsLoggingOut(false);
-    }
-  };
+  setIsLoggingOut(true);
+  try {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch (error) {
+    toast.error("Logout error: " + (error as any)?.message || "Unknown error");
+  } finally {
+    dispatch(logoutSuccess());
+    await signOut({ callbackUrl: "/login", redirect: true });
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#fcfbf7] p-4 md:p-8 space-y-8 font-['Archivo']">

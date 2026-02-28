@@ -120,8 +120,10 @@ const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
           </div>
 
           {/* User Avatar Placeholder */}
-          <div className="h-10 w-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm">
-            <UserCircle size={24} />
+          <div className="h-10 w-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm cursor-pointer">
+            <Link href="/profile">
+              <UserCircle size={24} />
+            </Link>
           </div>
         </div>
       </div>
