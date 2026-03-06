@@ -3,12 +3,21 @@ import connectDB from "@/lib/database/db_connection";
 import Expense from "@/lib/models/Expenses.model";
 import { expenseSchema } from "@/utils/validations";
 import { getUserId } from "@/lib/helpers/getUserId";
+import { deductCredits } from "@/lib/helpers/credits"; // ← add
 
 export async function POST(req: Request) {
   await connectDB();
   try {
     const userId = await getUserId();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { success, remaining } = await deductCredits(userId, "EXPENSE");
+    if (!success) {
+      return NextResponse.json(
+        { error: "insufficient_credits", message: "Not enough credits to log an expense", remaining },
+        { status: 402 }
+      );
+    }
 
     const body = await req.json();
     const parsed = expenseSchema.safeParse(body);
@@ -22,6 +31,7 @@ export async function POST(req: Request) {
   }
 }
 
+// GET aur DELETE same — no changes needed
 export async function GET() {
   await connectDB();
   try {
@@ -43,12 +53,10 @@ export async function GET() {
     }));
 
     const totalAmount = expenses.reduce((acc, exp) => acc + exp.amount, 0);
-
     const categoryCount: Record<string, number> = {};
     expenses.forEach((exp) => {
       categoryCount[exp.category] = (categoryCount[exp.category] || 0) + 1;
     });
-
     const topCategory = Object.entries(categoryCount).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
 
     return NextResponse.json({

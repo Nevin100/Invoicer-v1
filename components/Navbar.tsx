@@ -131,7 +131,6 @@ const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
   );
 };
 
-// Sub-component for cleaner dropdown links
 const DropdownLink = ({ href, label, color, onClick }: any) => (
   <Link
     href={href}

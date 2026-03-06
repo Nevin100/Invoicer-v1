@@ -1,4 +1,3 @@
-// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
@@ -7,16 +6,11 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-
   const publicRoutes = ["/", "/login", "/signup", "/profile/setup"];
   const isPublic = publicRoutes.includes(pathname);
 
   const token = req.cookies.get("token")?.value;
-  const googleSession =
-    req.cookies.get("authjs.session-token")?.value ||
-    req.cookies.get("__Secure-authjs.session-token")?.value;
-
-  let isAuthenticated = !!googleSession;
+  let isAuthenticated = false;
 
   if (token) {
     try {

@@ -8,7 +8,6 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { logoutSuccess } from "@/lib/redux/Features/authSlice";
 import { Badge } from "@/components/ui/badge";
-import { signOut } from "next-auth/react";
 import toast from "react-hot-toast";
 
 const Settings = () => {
@@ -23,11 +22,12 @@ const Settings = () => {
       method: "POST",
       credentials: "include",
     });
-  } catch (error) {
-    toast.error("Logout error: " + (error as any)?.message || "Unknown error");
-  } finally {
     dispatch(logoutSuccess());
-    await signOut({ callbackUrl: "/login", redirect: true });
+    router.push("/login");
+  } catch (error) {
+    toast.error("Logout failed, try again.");
+  } finally {
+    setIsLoggingOut(false);
   }
 };
 

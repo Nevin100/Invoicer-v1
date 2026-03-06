@@ -4,12 +4,21 @@ import Invoice from "@/lib/models/Invoice.model";
 import { invoiceSchema } from "@/utils/validations";
 import { ZodError } from "zod";
 import { getUserId } from "@/lib/helpers/getUserId";
+import { deductCredits } from "@/lib/helpers/credits"; // ← add
 
 export async function POST(req: Request) {
   try {
     await connectDB();
     const userId = await getUserId();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { success, remaining } = await deductCredits(userId, "INVOICE");
+    if (!success) {
+      return NextResponse.json(
+        { error: "insufficient_credits", message: "Not enough credits to create an invoice", remaining },
+        { status: 402 }
+      );
+    }
 
     const body = await req.json();
     const { status, ...payload } = body;

@@ -9,7 +9,6 @@ import { loginSuccess } from "@/lib/redux/Features/authSlice";
 import Swal from "sweetalert2";
 import { motion } from "framer-motion";
 import { ImSpinner2 } from "react-icons/im";
-import { signIn } from "next-auth/react";
 
 export default function SignupPage() {
   const dispatch = useDispatch();
@@ -25,15 +24,9 @@ export default function SignupPage() {
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-  const handleGoogleSignup = async () => {
+  const handleGoogleSignup = () => {
     setGoogleLoading(true);
-    try {
-      await signIn("google", { callbackUrl: "/dashboard" });
-    } catch {
-      setError("Google signup failed. Please try again.");
-    } finally {
-      setGoogleLoading(false);
-    }
+    window.location.href = "/api/auth/google";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

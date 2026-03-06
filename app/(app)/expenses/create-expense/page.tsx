@@ -11,108 +11,116 @@ import {
 } from "@/lib/redux/Features/expenseSlice";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { X, Calendar, Tag, FileText, IndianRupee, Loader2, UploadCloud } from "lucide-react";
+import { X, Calendar, Tag, FileText, IndianRupee, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CreditOverlay from "@/components/CreditOverlay";
 
 const Page = () => {
   const dispatch = useDispatch();
   const expense = useSelector((state: any) => state.expense);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCreditOverlay, setShowCreditOverlay] = useState(false);
+  const [creditRemaining, setCreditRemaining] = useState(0);
 
-const handleSubmit = async () => {
-  const { amount, currency, category, description, date } = expense;
+  const handleSubmit = async () => {
+    const { amount, currency, category, description, date } = expense;
 
-  if (!amount || !category || !description || !currency || !date) {
-    Swal.fire({
-      title: "Missing Fields",
-      text: "Fill all the required fields before submitting.",
-      icon: "warning",
-      confirmButtonColor: "#4f46e5",
-    });
-    return;
-  }
-
-  const parsedDate = new Date(date);
-  if (isNaN(parsedDate.getTime())) {
-    Swal.fire({
-      title: "Invalid Date",
-      text: "Please enter a valid date.",
-      icon: "warning",
-      confirmButtonColor: "#4f46e5",
-    });
-    return;
-  }
-
-  if (parsedDate > new Date()) {
-    Swal.fire({
-      title: "Future Date?",
-      text: "You cannot log an expense for a future date.",
-      icon: "warning",
-      confirmButtonColor: "#4f46e5",
-    });
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  try {
-    const res = await fetch("/api/expenses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(expense),
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
+    if (!amount || !category || !description || !currency || !date) {
       Swal.fire({
-        title: "Added!",
-        text: "Expense record has been successfully created.",
-        icon: "success",
+        title: "Missing Fields",
+        text: "Fill all the required fields before submitting.",
+        icon: "warning",
         confirmButtonColor: "#4f46e5",
       });
-
-      dispatch(resetExpense());
-    } else if (res.status === 401) {
-      window.location.href = "/login";
-    } else {
-      Swal.fire("Error", data.error || "Internal Server Error", "error");
+      return;
     }
 
-  } catch (error) {
-    console.log(error);
-    Swal.fire("Error", "Network problem!", "error");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      Swal.fire({
+        title: "Invalid Date",
+        text: "Please enter a valid date.",
+        icon: "warning",
+        confirmButtonColor: "#4f46e5",
+      });
+      return;
+    }
+
+    if (parsedDate > new Date()) {
+      Swal.fire({
+        title: "Future Date?",
+        text: "You cannot log an expense for a future date.",
+        icon: "warning",
+        confirmButtonColor: "#4f46e5",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch("/api/expenses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(expense),
+      });
+
+      const data = await res.json();
+
+      if (res.status === 402) {
+        setCreditRemaining(data.remaining);
+        setShowCreditOverlay(true);
+        return;
+      }
+
+      if (res.ok) {
+        Swal.fire({
+          title: "Added!",
+          text: "Expense record has been successfully created.",
+          icon: "success",
+          confirmButtonColor: "#4f46e5",
+        });
+        dispatch(resetExpense());
+      } else if (res.status === 401) {
+        window.location.href = "/login";
+      } else {
+        Swal.fire("Error", data.error || "Internal Server Error", "error");
+      }
+    } catch (error) {
+      console.log(error);
+      Swal.fire("Error", "Network problem!", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="relative w-full min-h-screen flex items-center justify-center bg-[#fcfbf7] px-4 py-10 overflow-hidden">
-      
-      {/* Soft Background Glows */}
       <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] bg-indigo-100/40 rounded-full blur-[120px]" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] bg-purple-100/40 rounded-full blur-[120px]" />
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="relative w-full max-w-6xl z-10 bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-slate-200 shadow-[0_30px_100px_rgba(0,0,0,0.08)] overflow-hidden"
       >
-        {/* Header Section */}
         <div className="p-8 md:p-10 border-b border-slate-100 flex items-center justify-between">
           <div>
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-none">
               Log <span className="text-indigo-600 italic">Expense.</span>
             </h2>
-            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-2">Track your spends efficiently</p>
+            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mt-2">
+              Track your spends efficiently
+            </p>
           </div>
           <Link href={"/expenses"}>
-            <motion.button 
-              whileHover={{ scale: 1.1, backgroundColor: "#fee2e2", color: "#ef4444" }}
+            <motion.button
+              whileHover={{
+                scale: 1.1,
+                backgroundColor: "#fee2e2",
+                color: "#ef4444",
+              }}
               className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500 transition-all cursor-pointer border border-slate-200 shadow-sm"
             >
               <X size={20} strokeWidth={3} />
@@ -121,41 +129,60 @@ const handleSubmit = async () => {
         </div>
 
         <div className="p-8 md:p-10 space-y-8">
-          
-          {/* Receipt Upload Area - Redesigned */}
           <div className="space-y-3 group">
             <Label title="Receipt / Attachment" />
             <div className="w-full h-32 bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 transition-all group">
-               <div className="relative w-12 h-12 mb-2 group-hover:scale-110 transition-transform">
-                 <Image src={"/Expense/reciept.png"} alt="Receipt" fill className="object-contain opacity-60 group-hover:opacity-100" />
-               </div>
-               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-indigo-600">Click to Upload Proof</span>
+              <div className="relative w-12 h-12 mb-2 group-hover:scale-110 transition-transform">
+                <Image
+                  src={"/Expense/reciept.png"}
+                  alt="Receipt"
+                  fill
+                  className="object-contain opacity-60 group-hover:opacity-100"
+                />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-indigo-600">
+                Click to Upload Proof
+              </span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            
-            {/* Amount and Currency */}
             <div className="md:col-span-2 flex flex-col sm:flex-row gap-4">
               <div className="flex-[3] space-y-3 group">
                 <Label title="Amount" />
                 <div className="flex items-center gap-3 bg-[#fdfdfb] border-2 border-slate-200 group-focus-within:border-indigo-600 rounded-2xl px-5 py-1 transition-all shadow-sm">
-                  <IndianRupee size={20} className="text-slate-400 group-focus-within:text-indigo-600" />
+                  <IndianRupee
+                    size={20}
+                    className="text-slate-400 group-focus-within:text-indigo-600"
+                  />
                   <input
                     type="number"
                     value={expense.amount}
-                    onChange={(e) => dispatch(setExpenseField({ field: "amount", value: parseFloat(e.target.value) || 0 }))}
+                    onChange={(e) =>
+                      dispatch(
+                        setExpenseField({
+                          field: "amount",
+                          value: parseFloat(e.target.value) || 0,
+                        }),
+                      )
+                    }
                     placeholder="0.00"
                     className="w-full h-12 bg-transparent border-none outline-none text-lg font-black text-slate-900 placeholder:text-slate-200"
                   />
                 </div>
               </div>
-              
               <div className="flex-1 space-y-3">
                 <Label title="Currency" />
                 <select
                   value={expense.currency}
-                  onChange={(e) => dispatch(setExpenseField({ field: "currency", value: e.target.value }))}
+                  onChange={(e) =>
+                    dispatch(
+                      setExpenseField({
+                        field: "currency",
+                        value: e.target.value,
+                      }),
+                    )
+                  }
                   className="w-full h-16 bg-[#fdfdfb] border-2 border-slate-200 rounded-2xl px-4 text-slate-800 font-black text-md focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 outline-none transition-all shadow-sm"
                 >
                   <option>INR</option>
@@ -165,28 +192,43 @@ const handleSubmit = async () => {
               </div>
             </div>
 
-            {/* Date */}
             <div className="space-y-3 group">
               <Label title="Date of Expense" />
               <div className="flex items-center gap-3 bg-[#fdfdfb] border-2 border-slate-200 group-focus-within:border-indigo-600 rounded-2xl px-5 py-1 transition-all shadow-sm">
-                <Calendar size={20} className="text-slate-400 group-focus-within:text-indigo-600" />
+                <Calendar
+                  size={20}
+                  className="text-slate-400 group-focus-within:text-indigo-600"
+                />
                 <input
                   type="date"
                   value={expense.date}
-                  onChange={(e) => dispatch(setExpenseField({ field: "date", value: e.target.value }))}
+                  onChange={(e) =>
+                    dispatch(
+                      setExpenseField({ field: "date", value: e.target.value }),
+                    )
+                  }
                   className="w-full h-12 bg-transparent border-none outline-none text-md font-black text-slate-800 uppercase"
                 />
               </div>
             </div>
 
-            {/* Category */}
             <div className="space-y-3 group">
               <Label title="Spending Category" />
               <div className="flex items-center gap-3 bg-[#fdfdfb] border-2 border-slate-200 group-focus-within:border-indigo-600 rounded-2xl px-5 py-1 transition-all shadow-sm">
-                <Tag size={20} className="text-slate-400 group-focus-within:text-indigo-600" />
+                <Tag
+                  size={20}
+                  className="text-slate-400 group-focus-within:text-indigo-600"
+                />
                 <select
                   value={expense.category}
-                  onChange={(e) => dispatch(setExpenseField({ field: "category", value: e.target.value }))}
+                  onChange={(e) =>
+                    dispatch(
+                      setExpenseField({
+                        field: "category",
+                        value: e.target.value,
+                      }),
+                    )
+                  }
                   className="w-full h-12 bg-transparent border-none outline-none text-md font-black text-slate-800 appearance-none"
                 >
                   <option value="">Select Category</option>
@@ -197,15 +239,24 @@ const handleSubmit = async () => {
               </div>
             </div>
 
-            {/* Description */}
             <div className="md:col-span-2 space-y-3 group">
               <Label title="Notes / Description" />
               <div className="flex items-center gap-3 bg-[#fdfdfb] border-2 border-slate-200 group-focus-within:border-indigo-600 rounded-2xl px-5 py-1 transition-all shadow-sm">
-                <FileText size={20} className="text-slate-400 group-focus-within:text-indigo-600" />
+                <FileText
+                  size={20}
+                  className="text-slate-400 group-focus-within:text-indigo-600"
+                />
                 <input
                   type="text"
                   value={expense.description}
-                  onChange={(e) => dispatch(setExpenseField({ field: "description", value: e.target.value }))}
+                  onChange={(e) =>
+                    dispatch(
+                      setExpenseField({
+                        field: "description",
+                        value: e.target.value,
+                      }),
+                    )
+                  }
                   placeholder="e.g. Flight to Mumbai or Starbucks Coffee"
                   className="w-full h-12 bg-transparent border-none outline-none text-md font-black text-slate-800 placeholder:text-slate-200 placeholder:font-bold"
                 />
@@ -213,7 +264,6 @@ const handleSubmit = async () => {
             </div>
           </div>
 
-          {/* Action Bar */}
           <div className="pt-10 flex flex-col sm:flex-row gap-4 border-t border-slate-50">
             <button
               onClick={() => dispatch(resetExpense())}
@@ -235,11 +285,19 @@ const handleSubmit = async () => {
           </div>
         </div>
       </motion.div>
+
+      {/* ✅ Credit Overlay */}
+      {showCreditOverlay && (
+        <CreditOverlay
+          action="log an expense"
+          remaining={creditRemaining}
+          onClose={() => setShowCreditOverlay(false)}
+        />
+      )}
     </div>
   );
 };
 
-// Helper Component for Labels
 const Label = ({ title }: { title: string }) => (
   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1 block">
     {title}

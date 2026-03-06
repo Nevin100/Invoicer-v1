@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { FiArrowRight, FiCheckCircle } from "react-icons/fi";
 
@@ -43,10 +44,12 @@ export default function CTA() {
               transition={{ delay: 0.2 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-6"
             >
-              <button className="w-full sm:w-auto bg-white text-indigo-600 px-10 py-6 rounded-2xl font-black text-xl hover:shadow-[0_20px_50px_rgba(255,255,255,0.2)] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 group/btn">
+              <Link href="/signup">
+                <button className="w-full sm:w-auto bg-white text-indigo-600 px-10 py-6 rounded-2xl font-black text-xl hover:shadow-[0_20px_50px_rgba(255,255,255,0.2)] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 group/btn cursor-pointer">
                 Let&apos;s Start
                 <FiArrowRight className="group-hover/btn:translate-x-1 transition-transform" />
               </button>
+              </Link>
             </motion.div>
 
             {/* Micro Trust Indicators */}
