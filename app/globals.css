@@ -139,3 +139,43 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+
+  body * {
+    visibility: hidden;
+  }
+
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* hide buttons while printing */
+  button {
+    display: none !important;
+  }
+
+  /* remove modal overlay */
+  .fixed.inset-0 {
+    background: white !important;
+    backdrop-filter: none !important;
+  }
+
+  /* avoid page break inside invoice */
+  table,
+  tr,
+  td {
+    page-break-inside: avoid;
+  }
+}

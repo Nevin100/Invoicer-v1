@@ -3,17 +3,11 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  useForm,
-  useFieldArray,
-  useWatch,
-  SubmitHandler,
-} from "react-hook-form";
+import { useForm, useFieldArray, useWatch, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Swal from "sweetalert2";
 import { format } from "date-fns";
 import { IoAddCircle } from "react-icons/io5";
-import { GoX } from "react-icons/go";
 import {
   CalendarIcon,
   FileText,
@@ -22,12 +16,17 @@ import {
   Trash2,
   Send,
   Save,
+  MapPin,
+  Mail,
+  Phone,
+  User,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
 import { invoiceSchema, InvoiceInput } from "@/utils/validations";
 import { fetchClients } from "@/lib/helpers/create_invoice/fetchClients";
 import { uptoTwoDecimalPlaces } from "@/lib/helpers/create_invoice/uptoTwoDecimalPlaces";
+import { getTelephoneCode } from "@/lib/helpers/create_invoice/getTelephoneCode";
 
 import {
   Form,
@@ -52,7 +51,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import BilledToClientDetails from "./billed_to_client_details";
 import { useRouter } from "next/navigation";
 
 export interface Client {
@@ -66,6 +64,86 @@ export interface Client {
   country: string;
   postal: string;
 }
+
+// ─── Merged BilledToClientDetails ────────────────────────────────────────────
+
+function BilledToClientDetails({
+  selectedClientDetails,
+}: {
+  selectedClientDetails: Client | null;
+}) {
+  if (!selectedClientDetails) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 gap-2 text-slate-300">
+        <User size={32} strokeWidth={1.5} />
+        <p className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+          No client selected
+        </p>
+      </div>
+    );
+  }
+
+  const { clientName, companyName, email, mobile, address, state, country, postal } =
+    selectedClientDetails;
+
+  const countryTelephoneCode = getTelephoneCode(country);
+
+  return (
+    <div className="space-y-4">
+      {/* Name + Company */}
+      <div>
+        <h3 className="text-base font-black text-slate-900 tracking-tight">
+          {clientName}
+        </h3>
+        {companyName && (
+          <p className="text-[11px] font-bold uppercase tracking-widest text-indigo-500 mt-0.5">
+            {companyName}
+          </p>
+        )}
+      </div>
+
+      <Separator className="bg-slate-100" />
+
+      <div className="space-y-2.5">
+        {/* Address */}
+        {(address || state || country) && (
+          <div className="flex items-start gap-2.5">
+            <div className="p-1.5 bg-slate-100 rounded-lg mt-0.5">
+              <MapPin size={11} className="text-slate-500" />
+            </div>
+            <p className="text-[12px] text-slate-600 font-medium leading-relaxed">
+              {[address, state, country, postal].filter(Boolean).join(", ")}
+            </p>
+          </div>
+        )}
+
+        {/* Email */}
+        {email && (
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 bg-slate-100 rounded-lg">
+              <Mail size={11} className="text-slate-500" />
+            </div>
+            <p className="text-[12px] text-slate-600 font-medium">{email}</p>
+          </div>
+        )}
+
+        {/* Phone */}
+        {mobile && (
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 bg-slate-100 rounded-lg">
+              <Phone size={11} className="text-slate-500" />
+            </div>
+            <p className="text-[12px] text-slate-600 font-medium">
+              {countryTelephoneCode} {mobile}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Form ────────────────────────────────────────────────────────────────
 
 const CreateInvoiceForm = () => {
   const [clients, setClients] = useState<Client[]>([]);
@@ -103,25 +181,19 @@ const CreateInvoiceForm = () => {
   }, []);
 
   const items = useWatch({ control: form.control, name: "items" });
-  const discountPercent =
-    useWatch({ control: form.control, name: "discountPercent" }) ?? 0;
-  const taxPercent =
-    useWatch({ control: form.control, name: "taxPercent" }) ?? 0;
+  const discountPercent = useWatch({ control: form.control, name: "discountPercent" }) ?? 0;
+  const taxPercent = useWatch({ control: form.control, name: "taxPercent" }) ?? 0;
 
   useEffect(() => {
     if (!items) return;
     const subTotal = uptoTwoDecimalPlaces(
       items.reduce((sum, i) => sum + i.quantity * i.rate, 0),
     );
-    const discountAmount = uptoTwoDecimalPlaces(
-      (subTotal * discountPercent) / 100,
-    );
+    const discountAmount = uptoTwoDecimalPlaces((subTotal * discountPercent) / 100);
     const taxAmount = uptoTwoDecimalPlaces(
       ((subTotal - discountAmount) * taxPercent) / 100,
     );
-    const totalAmount = uptoTwoDecimalPlaces(
-      subTotal - discountAmount + taxAmount,
-    );
+    const totalAmount = uptoTwoDecimalPlaces(subTotal - discountAmount + taxAmount);
 
     form.setValue("subTotal", subTotal);
     form.setValue("discountAmount", discountAmount);
@@ -145,11 +217,10 @@ const CreateInvoiceForm = () => {
 
   const handleSaveDraft = async () => {
     try {
-      const token = localStorage.getItem("token");
       await axios.post(
         "/api/invoices",
         { ...form.getValues(), status: "Draft" },
-        { withCredentials: true }, // ✅ cookie auto attach
+        { withCredentials: true },
       );
       Swal.fire("Saved", "Draft saved", "success");
       router.push("/invoices");
@@ -164,7 +235,7 @@ const CreateInvoiceForm = () => {
         onSubmit={form.handleSubmit(onSubmit)}
         className="max-w-5xl mx-auto space-y-8 font-['Archivo'] pb-20"
       >
-        {/* HEADER SECTION */}
+        {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-8">
           <div>
             <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase">
@@ -185,7 +256,6 @@ const CreateInvoiceForm = () => {
             </Button>
             <Button
               type="submit"
-              disabled
               className="flex-1 md:flex-none rounded-2xl bg-slate-900 font-black text-[10px] uppercase tracking-widest py-6 px-8 hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200"
             >
               <Send className="mr-2 w-4 h-4" /> Send Invoice
@@ -269,9 +339,7 @@ const CreateInvoiceForm = () => {
                         variant="outline"
                         className="w-full justify-between bg-slate-50 border-none rounded-xl font-black text-xs py-5"
                       >
-                        {field.value
-                          ? format(field.value, "PPP")
-                          : "Select Date"}
+                        {field.value ? format(field.value, "PPP") : "Select Date"}
                         <CalendarIcon size={14} className="text-slate-400" />
                       </Button>
                     </PopoverTrigger>
@@ -292,11 +360,12 @@ const CreateInvoiceForm = () => {
         {/* CLIENT SELECTION */}
         <section className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
           <div className="flex items-center gap-3">
-            <div className="w-1.5 h-8 bg-indigo-600 rounded-full"></div>
+            <div className="w-1.5 h-8 bg-indigo-600 rounded-full" />
             <h2 className="text-lg font-black text-slate-900 tracking-tight uppercase">
               Billed To
             </h2>
           </div>
+
           <FormField
             name="clientId"
             render={({ field }) => (
@@ -305,29 +374,34 @@ const CreateInvoiceForm = () => {
                   value={field.value}
                   onValueChange={(val) => {
                     field.onChange(val);
-                    setSelectedClient(
-                      clients.find((c) => c._id === val) || null,
-                    );
+                    setSelectedClient(clients.find((c) => c._id === val) || null);
                   }}
                 >
                   <SelectTrigger className="w-full bg-slate-50 border-none h-14 rounded-2xl px-6 font-black text-slate-700">
                     <SelectValue placeholder="Search or Select Client" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-slate-100 shadow-2xl">
-                    {clients.map((c) => (
-                      <SelectItem
-                        key={c._id}
-                        value={c._id}
-                        className="font-bold py-3 uppercase text-[10px] tracking-widest"
-                      >
-                        {c.clientName}
-                      </SelectItem>
-                    ))}
+                    {clients.length === 0 ? (
+                      <div className="py-4 text-center text-[11px] font-black uppercase tracking-widest text-slate-400">
+                        No clients found
+                      </div>
+                    ) : (
+                      clients.map((c) => (
+                        <SelectItem
+                          key={c._id}
+                          value={c._id}
+                          className="font-bold py-3 uppercase text-[10px] tracking-widest"
+                        >
+                          {c.clientName}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </FormItem>
             )}
           />
+
           <div className="bg-slate-50/50 rounded-3xl p-6">
             <BilledToClientDetails selectedClientDetails={selectedClient} />
           </div>
@@ -335,13 +409,11 @@ const CreateInvoiceForm = () => {
 
         {/* LINE ITEMS */}
         <section className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-8 bg-indigo-600 rounded-full"></div>
-              <h2 className="text-lg font-black text-slate-900 tracking-tight uppercase">
-                Line Items
-              </h2>
-            </div>
+          <div className="flex items-center gap-3">
+            <div className="w-1.5 h-8 bg-indigo-600 rounded-full" />
+            <h2 className="text-lg font-black text-slate-900 tracking-tight uppercase">
+              Line Items
+            </h2>
           </div>
 
           <div className="space-y-4">
@@ -400,10 +472,7 @@ const CreateInvoiceForm = () => {
                     Total
                   </label>
                   <div className="h-12 bg-indigo-50/50 rounded-xl flex items-center px-4 font-black text-indigo-600 italic">
-                    ₹
-                    {uptoTwoDecimalPlaces(
-                      items?.[index]?.quantity * items?.[index]?.rate || 0,
-                    )}
+                    ₹{uptoTwoDecimalPlaces(items?.[index]?.quantity * items?.[index]?.rate || 0)}
                   </div>
                 </div>
                 <div className="md:col-span-1 flex items-end pb-1 justify-center">
@@ -423,21 +492,20 @@ const CreateInvoiceForm = () => {
           <Button
             type="button"
             variant="outline"
-            onClick={() =>
-              append({ name: "", quantity: 1, rate: 0, ishourly: false })
-            }
+            onClick={() => append({ name: "", quantity: 1, rate: 0, ishourly: false })}
             className="w-full py-8 border-dashed border-2 border-slate-200 rounded-[2rem] text-slate-400 font-black uppercase tracking-[0.2em] hover:bg-slate-50 hover:border-indigo-300 hover:text-indigo-600 transition-all"
           >
             <IoAddCircle className="mr-2 h-5 w-5" /> Add New Item Row
           </Button>
         </section>
 
-        {/* BOTTOM SECTION: NOTES & CALCULATIONS */}
+        {/* BOTTOM: NOTES + SUMMARY */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          {/* Notes */}
           <div className="md:col-span-7 space-y-6">
             <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
               <div className="flex items-center gap-3">
-                <div className="w-1.5 h-6 bg-slate-900 rounded-full"></div>
+                <div className="w-1.5 h-6 bg-slate-900 rounded-full" />
                 <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest">
                   Additional Notes
                 </h2>
@@ -475,6 +543,7 @@ const CreateInvoiceForm = () => {
             </div>
           </div>
 
+          {/* Summary */}
           <div className="md:col-span-5 space-y-6">
             <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
               <div className="space-y-4">

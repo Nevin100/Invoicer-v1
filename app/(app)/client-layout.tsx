@@ -5,13 +5,29 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import TopProgressBar from "@/components/TopProgressBar";
+import { useRouter } from "next/navigation";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
-
+  const router = useRouter();
   const isAuthPage = pathname === "/login" || pathname === "/signup";
   const isFullWidthPage = pathname === "/invoices/create-invoice";
+
+  const isProfileSetup = pathname === "/profile/setup"; // ← add karo
+
+  useEffect(() => {
+    if (isAuthPage || isProfileSetup) return;
+
+    fetch("/api/profile", { credentials: "include" })
+      .then(r => r.json())
+      .then(d => {
+        if (!d.profile || !d.profile.isComplete) {
+          router.push("/profile/setup");
+        }
+      })
+      .catch(() => {}); 
+  }, [pathname]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
