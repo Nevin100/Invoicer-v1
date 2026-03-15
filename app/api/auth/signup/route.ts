@@ -4,16 +4,19 @@ import User from "@/lib/models/User.model";
 import { signupSchema } from "@/utils/validations";
 import jwt from "jsonwebtoken";
 import connectDB from "@/lib/database/db_connection";
+import logger from "@/lib/logger";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export async function POST(req: Request) {
+  logger.info("Received signup request");
   try {
     await connectDB();
     const body = await req.json();
 
     const parsedData = signupSchema.safeParse(body);
     if (!parsedData.success) {
+      logger.warn("Validation failed for signup request", { errors: parsedData.error.errors });
       return NextResponse.json(
         { error: parsedData.error.errors },
         { status: 400 }
@@ -22,6 +25,7 @@ export async function POST(req: Request) {
 
     const existingUser = await User.findOne({ email: body.email });
     if (existingUser) {
+      logger.warn("Email already exists for signup request", { email: body.email });
       return NextResponse.json(
         { error: "Email already exists" },
         { status: 400 }
@@ -36,14 +40,12 @@ export async function POST(req: Request) {
       password: hashedPassword,
     });
 
-    //  Generate JWT
     const token = jwt.sign(
       { userId: newUser._id, username: newUser.username },
       JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    //  Create response
     const response = NextResponse.json(
       {
         message: "User registered successfully",
@@ -56,7 +58,6 @@ export async function POST(req: Request) {
       { status: 201 }
     );
 
-    //  Set HTTP Only Cookie
     response.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -65,9 +66,11 @@ export async function POST(req: Request) {
       path: "/",
     });
 
+    logger.info("User registered successfully", { userId: newUser._id });
     return response;
 
   } catch (error) {
+    logger.error("Signup error:", error);
     return NextResponse.json(
       { error: "Internal Server issue" },
       { status: 500 }

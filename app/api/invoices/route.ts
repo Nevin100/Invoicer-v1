@@ -1,19 +1,32 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/database/db_connection";
 import Invoice from "@/lib/models/Invoice.model";
 import { invoiceSchema } from "@/utils/validations";
 import { ZodError } from "zod";
 import { getUserId } from "@/lib/helpers/getUserId";
-import { deductCredits } from "@/lib/helpers/credits"; // ← add
+import { deductCredits } from "@/lib/helpers/credits";
+import { cache } from "@/lib/Redis/cache";
+import { CacheKeys } from "@/lib/Redis/cacheKeys";
+import { withRateLimit } from "@/lib/Redis/withRateLimit";
+import logger from "@/lib/logger";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  logger.info("Received request to create a new invoice");
   try {
     await connectDB();
     const userId = await getUserId();
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    logger.info(`User ID retrieved Successfully: ${userId}`);
+    if (!userId) {
+      logger.warn("Unauthorized request to create invoice");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rl = await withRateLimit(req, userId, "general");
+    if (rl) return rl;
 
     const { success, remaining } = await deductCredits(userId, "INVOICE");
     if (!success) {
+      logger.warn("Insufficient credits to create an invoice");
       return NextResponse.json(
         { error: "insufficient_credits", message: "Not enough credits to create an invoice", remaining },
         { status: 402 }
@@ -44,8 +57,15 @@ export async function POST(req: Request) {
       status: status ?? "Draft",
     });
 
+    await Promise.all([
+      cache.del(CacheKeys.invoices(userId)),
+      cache.del(CacheKeys.analytics(userId)),
+    ]);
+
+    logger.info("New invoice created successfully");
     return NextResponse.json(invoice, { status: 201 });
   } catch (error: any) {
+    logger.error("Server error occurred while creating invoice", error);
     if (error instanceof ZodError) {
       return NextResponse.json({ error: error.flatten() }, { status: 400 });
     }
@@ -53,18 +73,33 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  logger.info("Received request to fetch invoices");
   try {
     await connectDB();
     const userId = await getUserId();
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    logger.info(`User ID retrieved Successfully: ${userId}`);
+    if (!userId) {
+      logger.warn("Unauthorized request to fetch invoices");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rl = await withRateLimit(req, userId, "general");
+    if (rl) return rl;
+
+    const cacheKey = CacheKeys.invoices(userId);
+    const cached = await cache.get(cacheKey);
+    if (cached) return NextResponse.json(cached, { status: 200 });
 
     const invoices = await Invoice.find({ user: userId })
       .populate("client", "clientName email")
       .sort({ createdAt: -1 });
 
+    await cache.set(cacheKey, invoices, 60 * 3); 
+
     return NextResponse.json(invoices, { status: 200 });
   } catch (error: any) {
+    logger.error("Server error occurred while fetching invoices", error);
     return NextResponse.json({ error: "Failed to fetch invoices" }, { status: 500 });
   }
 }

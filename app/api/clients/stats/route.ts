@@ -2,12 +2,18 @@ import { NextResponse } from "next/server";
 import { Client } from "@/lib/models/Clients.model";
 import connectDB from "@/lib/database/db_connection";
 import { getUserId } from "@/lib/helpers/getUserId";
+import logger from "@/lib/logger";
 
 export async function GET() {
   try {
+    logger.info("Received request to fetch client statistics");
     await connectDB();
     const userId = await getUserId();
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    logger.info(`User ID retrieved Successfully`);
+    if (!userId) {
+      logger.warn("Unauthorized request to fetch client statistics");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const clients = await Client.find({ user: userId });
     const totalClients = clients.length;
@@ -26,8 +32,10 @@ export async function GET() {
       .map(([date, value]) => ({ name: date, value }))
       .sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime());
 
+    logger.info("Client statistics fetched successfully");
     return NextResponse.json({ totalClients, totalPayment, chartData });
   } catch (err) {
+    logger.error("Server error occurred while fetching client statistics", err);
     return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
 }

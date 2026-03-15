@@ -1,21 +1,28 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import connectDB from "@/lib/database/db_connection";
 import User from "@/lib/models/User.model";
+import { withRateLimit } from "@/lib/Redis/withRateLimit";
+import logger from "@/lib/logger";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
+  logger.info("Received Google OAuth callback request");
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "anonymous";
+  const rl = await withRateLimit(req, ip, "sensitive");
+  if (rl) return rl;
+
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
   const error = searchParams.get("error");
 
   if (error || !code) {
+    logger.warn("Google OAuth request failed");
     return NextResponse.redirect(new URL("/login?error=google_denied", req.url));
   }
 
   try {
-    // Step 1: Code → Access Token
     const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -29,15 +36,16 @@ export async function GET(req: Request) {
     });
 
     const tokenData = await tokenRes.json();
-    if (!tokenRes.ok) throw new Error("Token exchange failed");
+    if (!tokenRes.ok) {
+      logger.error("Failed to exchange code for token:", tokenData);
+      throw new Error("Token exchange failed");
+    }
 
-    // Step 2: Access Token → Google User Info
     const userRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
     const googleUser = await userRes.json();
 
-    // Step 3: Find or Create User in MongoDB
     await connectDB();
     let user = await User.findOne({ email: googleUser.email });
     if (!user) {
@@ -49,14 +57,12 @@ export async function GET(req: Request) {
       });
     }
 
-    // Step 4: Sign our own JWT (same as email/password flow)
     const token = jwt.sign(
       { userId: user._id, username: user.username },
       JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    // Step 5: Set cookie + redirect
     const response = NextResponse.redirect(new URL("/dashboard", req.url));
     response.cookies.set("token", token, {
       httpOnly: true,
@@ -68,7 +74,7 @@ export async function GET(req: Request) {
 
     return response;
   } catch (err) {
-    console.error("Google OAuth error:", err);
+    logger.error("Google OAuth error:", err);
     return NextResponse.redirect(new URL("/login?error=google_failed", req.url));
   }
 }
