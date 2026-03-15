@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const { orderId, paymentId, signature } = await req.json();
  
   const expectedSig = crypto
-    .createHmac("sha256", process.env.NEXT_PUBLIC_RAZORPAY_KEY_SECRET!)
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
     .update(`${orderId}|${paymentId}`)
     .digest("hex");
  
