@@ -5,8 +5,8 @@ import { withRateLimit } from "@/lib/Redis/withRateLimit";
 import logger from "@/lib/logger";
  
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
+  key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+  key_secret: process.env.NEXT_PUBLIC_RAZORPAY_KEY_SECRET!,
 });
  
 function parseCoupons(): Record<string, number> {
