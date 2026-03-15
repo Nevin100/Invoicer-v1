@@ -16,7 +16,13 @@ function AuthSync({ children }: { children: React.ReactNode }) {
         if (res.ok && !toastShown.current) {
           const data = await res.json();
           toastShown.current = true;
-          dispatch(loginSuccess());
+          dispatch(loginSuccess({
+            username: data.user.username,
+            email: data.user.email,
+            avatar: data.user.avatar || null,
+            credits: data.user.credits ?? 200,
+            plan: data.user.plan ?? "starter",
+          }));
           toast.success(`Welcome back, ${data.user?.username?.split(" ")[0] || "User"}! 👋`, {
             style: {
               background: "#1e293b",

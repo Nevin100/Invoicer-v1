@@ -25,7 +25,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
-import CreditOverlay from "@/components/CreditOverlay"; // ← add
+import CreditOverlay from "@/components/CreditOverlay";
 
 export interface Client {
   _id: string;
@@ -90,6 +90,9 @@ const CreateInvoiceForm = () => {
   const [showCreditOverlay, setShowCreditOverlay] = useState(false);
   const [creditRemaining, setCreditRemaining] = useState(0);
 
+  // ── NEW: loading state for Next button ──
+  const [savingDraft, setSavingDraft] = useState(false);
+
   const form = useForm<InvoiceInput>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: {
@@ -131,6 +134,28 @@ const CreateInvoiceForm = () => {
     form.setValue("totalAmount", totalAmount);
   }, [items, discountPercent, taxPercent, form]);
 
+  const handleNext = async () => {
+    setSavingDraft(true);
+    try {
+      const res = await axios.post(
+        "/api/invoices",
+        { ...form.getValues(), status: "Draft" },
+        { withCredentials: true }
+      );
+      const invoiceId = (res.data as { _id: string })._id;
+      router.push(`/invoices/${invoiceId}/edit`);
+    } catch (error: any) {
+      if (error?.response?.status === 402) {
+        setCreditRemaining(error.response.data?.remaining ?? 0);
+        setShowCreditOverlay(true);
+        return;
+      }
+      Swal.fire("Error", "Failed to save draft", "error");
+    } finally {
+      setSavingDraft(false);
+    }
+  };
+
   const onSubmit: SubmitHandler<InvoiceInput> = async (values) => {
     try {
       await axios.post("/api/send/invoices", { ...values, status: "Sent" }, { withCredentials: true });
@@ -143,21 +168,6 @@ const CreateInvoiceForm = () => {
         return;
       }
       Swal.fire("Error", "Failed to send invoice", "error");
-    }
-  };
-
-  const handleSaveDraft = async () => {
-    try {
-      await axios.post("/api/invoices", { ...form.getValues(), status: "Draft" }, { withCredentials: true });
-      Swal.fire("Saved", "Draft saved", "success");
-      router.push("/invoices");
-    } catch (error: any) {
-      if (error?.response?.status === 402) {
-        setCreditRemaining(error.response.data?.remaining ?? 0);
-        setShowCreditOverlay(true);
-        return;
-      }
-      Swal.fire("Error", "Failed to save draft", "error");
     }
   };
 
@@ -176,11 +186,33 @@ const CreateInvoiceForm = () => {
               </h1>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-1">Generate professional billing</p>
             </div>
+
+            {/* ── CHANGED: 2 buttons → Save Draft + Next ── */}
             <div className="flex gap-3 w-full md:w-auto">
-              <Button type="button" variant="outline" onClick={handleSaveDraft} className="flex-1 md:flex-none rounded-2xl border-slate-200 font-black text-[10px] uppercase tracking-widest py-6 px-8 hover:bg-slate-50 transition-all">
-                <Save className="mr-2 w-4 h-4" /> Save Draft
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleNext}
+                disabled={savingDraft}
+                className="flex-1 md:flex-none rounded-2xl border-slate-200 font-black text-[10px] uppercase tracking-widest py-6 px-8 hover:bg-slate-50 transition-all"
+              >
+                <Save className="mr-2 w-4 h-4" />
+                {savingDraft ? "Saving..." : "Save Draft"}
               </Button>
-              <Button type="submit" className="flex-1 md:flex-none rounded-2xl bg-slate-900 font-black text-[10px] uppercase tracking-widest py-6 px-8 hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200">
+
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={savingDraft}
+                className="flex-1 md:flex-none rounded-2xl bg-indigo-600 font-black text-[10px] uppercase tracking-widest py-6 px-8 hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 text-white disabled:opacity-50"
+              >
+                {savingDraft ? "Saving..." : "Next →"}
+              </Button>
+
+              <Button
+                type="submit"
+                className="flex-1 md:flex-none rounded-2xl bg-slate-900 font-black text-[10px] uppercase tracking-widest py-6 px-8 hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200"
+              >
                 <Send className="mr-2 w-4 h-4" /> Send Invoice
               </Button>
             </div>

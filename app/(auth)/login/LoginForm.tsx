@@ -46,7 +46,15 @@ export default function LoginPage() {
 
       if (!res.ok) throw new Error(data.message || "Access Denied");
 
-      dispatch(loginSuccess());
+      dispatch(
+        loginSuccess({
+          username: data.user.username,
+          email: data.user.email,
+          avatar: data.user.avatar || null,
+          credits: data.user.credits ?? 200,
+          plan: data.user.plan ?? "starter",
+        }),
+      );
       router.push("/dashboard");
       router.refresh();
     } catch (error) {

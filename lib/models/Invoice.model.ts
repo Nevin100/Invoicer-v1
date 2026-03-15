@@ -76,8 +76,7 @@ const invoiceSchema = new mongoose.Schema(
 
     termsAndConditions: {
       type: String,
-      default:
-        "Please pay within 15 days from the date of invoice.",
+      default: "Please pay within 15 days from the date of invoice.",
     },
 
     status: {
@@ -96,8 +95,33 @@ const invoiceSchema = new mongoose.Schema(
       enum: ["Monthly", "Weekly", "Quarterly", "Yearly"],
       default: "Monthly",
     },
+
+    logo: {
+      type: String, // base64 string
+      default: null,
+    },
+
+    accentColor: {
+      type: String,
+      default: "#0f0f0f",
+    },
+
+    paymentLink: {
+      type: String,
+      default: null,
+    },
+
+    sentAt: {
+      type: Date,
+      default: null,
+    },
+
+    paidAt: {
+      type: Date,
+      default: null,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.models.Invoice ||

@@ -31,6 +31,8 @@ export async function GET() {
         username: user.username,
         email: user.email,
         avatar: user.avatar || null,
+        credits: user.credits || 0,
+        plan: user.plan || "free",
       },
     });
   } catch(error) {

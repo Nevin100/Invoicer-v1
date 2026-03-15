@@ -14,7 +14,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const isAuthPage = pathname === "/login" || pathname === "/signup";
   const isFullWidthPage = pathname === "/invoices/create-invoice";
 
-  const isProfileSetup = pathname === "/profile/setup"; // ← add karo
+  const isProfileSetup = pathname === "/profile/setup";
 
   useEffect(() => {
     if (isAuthPage || isProfileSetup) return;

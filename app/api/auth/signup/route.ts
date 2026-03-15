@@ -53,6 +53,9 @@ export async function POST(req: Request) {
           id: newUser._id,
           username: newUser.username,
           email: newUser.email,
+          avatar: newUser.avatar || null,  
+          credits: newUser.credits ?? 200, 
+          plan: newUser.plan ?? "starter", 
         },
       },
       { status: 201 }

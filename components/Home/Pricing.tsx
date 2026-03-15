@@ -2,6 +2,8 @@
 import { motion } from "framer-motion";
 import { FiCheck, FiZap, FiTarget } from "react-icons/fi";
 import { Zap, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const FREE_FEATURES = [
   { text: "200 Credits on signup", highlight: true, included: true },
@@ -37,6 +39,8 @@ const CREDIT_COSTS = [
 ];
 
 export default function Pricing() {
+  const router = useRouter(); 
+
   return (
     <section id="pricing" className="py-24 px-4 sm:px-6 bg-[#fcfcfd] relative overflow-hidden font-['Archivo']">
 
@@ -90,7 +94,7 @@ export default function Pricing() {
           ))}
         </motion.div>
 
-        {/* Plans — same height via items-stretch */}
+        {/* Plans */}
         <div className="grid md:grid-cols-2 gap-6 items-stretch">
 
           {/* FREE CARD */}
@@ -145,9 +149,13 @@ export default function Pricing() {
               </ul>
 
               <div className="mt-8 space-y-3">
-                <button className="w-full py-4 rounded-2xl bg-slate-900 hover:bg-indigo-600 text-white font-black text-xs uppercase tracking-widest transition-all duration-300 active:scale-[0.98] shadow-lg shadow-slate-200">
-                  Get Started Free
-                </button>
+                <Link href={"/signup"}>
+                  <button
+                    className="w-full py-4 rounded-2xl bg-slate-900 hover:bg-indigo-600 text-white font-black text-xs uppercase tracking-widest transition-all duration-300 active:scale-[0.98] shadow-lg shadow-slate-200"
+                  >
+                    Get Started Free
+                  </button>
+                </Link>
                 <p className="text-center text-[10px] font-bold text-slate-300 uppercase tracking-widest">No credit card required</p>
               </div>
             </div>
@@ -160,7 +168,6 @@ export default function Pricing() {
             transition={{ delay: 0.2 }}
             className="flex flex-col bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-[0_40px_80px_-15px_rgba(79,70,229,0.25)] relative"
           >
-            {/* Glow orb */}
             <div className="absolute top-0 right-0 w-72 h-72 bg-indigo-600 rounded-full blur-[120px] opacity-10 pointer-events-none" />
 
             <div className="p-8 border-b border-white/5 relative z-10">
@@ -201,9 +208,14 @@ export default function Pricing() {
               </ul>
 
               <div className="mt-8 space-y-3">
-                <button className="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-widest transition-all duration-300 active:scale-[0.98] shadow-xl shadow-indigo-500/20">
+                {/* ← CHANGED: onClick added */}
+                <Link href={"/upgrade/pro"}> 
+                <button
+                  className="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-widest transition-all duration-300 active:scale-[0.98] shadow-xl shadow-indigo-500/20"
+                >
                   Upgrade to Pro
                 </button>
+                </Link>
                 <p className="text-center text-[10px] font-bold text-slate-600 uppercase tracking-widest">Cancel anytime</p>
               </div>
             </div>
