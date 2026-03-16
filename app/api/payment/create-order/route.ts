@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   try {
     const RazorpaySDK = (await import("razorpay")).default;
     const razorpay = new RazorpaySDK({
-      key_id: process.env.RAZORPAY_KEY_ID!,
+      key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
       key_secret: process.env.RAZORPAY_KEY_SECRET!,
     });
     logger.info("Create order request received");

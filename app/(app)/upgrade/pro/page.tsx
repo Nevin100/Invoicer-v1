@@ -112,7 +112,7 @@ export default function ProPaymentPage() {
       }
 
       const rzp = new window.Razorpay({
-        key: process.env.RAZORPAY_KEY_ID,
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
         currency: data.currency,
         name: "Invoicer",
