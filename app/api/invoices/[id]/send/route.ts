@@ -13,6 +13,7 @@ import logger from "@/lib/logger";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
+// Sending invoice email with payment link and QR code generation, along with rate limiting and error handling. 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
