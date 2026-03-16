@@ -6,7 +6,7 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const publicRoutes = ["/", "/login", "/signup", "/profile/setup","/upgrade/pro"];
+  const publicRoutes = ["/", "/login", "/signup", "/profile/setup"];
   const isPublic = publicRoutes.includes(pathname);
 
   const token = req.cookies.get("token")?.value;
