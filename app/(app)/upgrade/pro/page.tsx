@@ -92,38 +92,39 @@ export default function ProPaymentPage() {
   };
 
   const handlePay = async () => {
-    if (isFree) { handleFreeUpgrade(); return; }
-    setPaying(true);
-    try {
-      const { data } = await axios.post<{ orderId: string; amount: number; currency: string }>(
-        "/api/payment/create-order",
-        { couponCode: couponApplied ? coupon.trim() : null },
-        { withCredentials: true }
-      );
+  if (isFree) { handleFreeUpgrade(); return; }
+  setPaying(true);
+  try {
+    const { data } = await axios.post<{ orderId: string; amount: number; currency: string }>(
+      "/api/payment/create-order",
+      { couponCode: couponApplied ? coupon.trim() : null },
+      { withCredentials: true }
+    );
 
-      if (!window.Razorpay) {
-        await new Promise<void>((resolve, reject) => {
-          const script = document.createElement("script");
-          script.src = "https://checkout.razorpay.com/v1/checkout.js";
-          script.onload = () => resolve();
-          script.onerror = () => reject();
-          document.body.appendChild(script);
-        });
-      }
+    if (!window.Razorpay) {
+      await new Promise<void>((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("Razorpay SDK load failed"));
+        document.body.appendChild(script);
+      });
+    }
 
-      const rzp = new window.Razorpay({
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: data.amount,
-        currency: data.currency,
-        name: "Invoicer",
-        description: "Pro Plan — 1,500 credits/month",
-        order_id: data.orderId,
-        theme: { color: "#4f46e5" },
-        handler: async (response: {
-          razorpay_order_id: string;
-          razorpay_payment_id: string;
-          razorpay_signature: string;
-        }) => {
+    const rzp = new window.Razorpay({
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      amount: data.amount,
+      currency: data.currency,
+      name: "Invoicer",
+      description: "Pro Plan — 1,500 credits/month",
+      order_id: data.orderId,
+      theme: { color: "#4f46e5" },
+      handler: async (response: {
+        razorpay_order_id: string;
+        razorpay_payment_id: string;
+        razorpay_signature: string;
+      }) => {
+        try {
           await axios.post(
             "/api/payment/verify",
             {
@@ -135,18 +136,24 @@ export default function ProPaymentPage() {
           );
           setSuccess(true);
           setTimeout(() => router.push("/dashboard"), 2800);
-        },
-        modal: { ondismiss: () => setPaying(false) },
-      });
-      rzp.open();
-    } catch (err: any) {
-      alert(err?.response?.data?.error || "Payment failed. Try again.");
-      setPaying(false);
-    }
-  };
+        } catch (err: any) {
+          setPaying(false);
+          alert(err?.response?.data?.error || "Payment verification failed. Contact support with your payment ID: " + response.razorpay_payment_id);
+        }
+      },
+      modal: {
+        ondismiss: () => setPaying(false)
+      },
+    });
 
-  // ── Success Screen ──
-  if (success) {
+    rzp.open();
+  } catch (err: any) {
+    alert(err?.response?.data?.error || "Could not initiate payment. Try again.");
+    setPaying(false); 
+  }
+};
+
+if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f9f8ff]">
         <motion.div

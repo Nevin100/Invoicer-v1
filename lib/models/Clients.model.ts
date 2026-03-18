@@ -1,4 +1,3 @@
-// lib/models/Clients.model.ts
 import mongoose from "mongoose";
 
 const ClientSchema = new mongoose.Schema(

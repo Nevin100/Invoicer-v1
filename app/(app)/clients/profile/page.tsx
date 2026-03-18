@@ -154,7 +154,7 @@ const ClientProfileContent = () => {
 
             <div className="bg-slate-900 text-white p-6 rounded-[2.5rem] min-w-[200px] text-center shadow-2xl shadow-slate-200">
                <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-60 mb-1">Service Value</p>
-               <h3 className="text-3xl font-black italic tracking-tighter text-indigo-400">₹{client.serviceCharge.toLocaleString()}</h3>
+               <h3 className="text-3xl font-black italic tracking-tighter text-indigo-400">₹{client.serviceCharge}</h3>
             </div>
           </div>
         ) : (

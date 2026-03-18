@@ -31,7 +31,13 @@ export async function POST(
     }
       
     const rl = await withRateLimit(req, userId, "sensitive");
-    if (rl) return rl;
+    if (rl) {
+      logger.warn("Rate limit exceeded for sending invoice", { invoiceId: id, userId });
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    };
 
     const invoice = await Invoice.findOne({ _id: id, user: userId }).populate(
       "client",
