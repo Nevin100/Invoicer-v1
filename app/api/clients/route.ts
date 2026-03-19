@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
     if (cached) return NextResponse.json(cached, { status: 200 });
 
     const clients = await Client.find({ user: userId }).sort({ createdAt: -1 });
-    await cache.set(cacheKey, clients); // 5 min TTL
+    await cache.set(cacheKey, clients); 
 
     logger.info("Clients fetched successfully");
     return NextResponse.json(clients, { status: 200 });

@@ -42,26 +42,6 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
-  logger.info("Received request to fetch clients");
-  await connectDB();
-  try {
-    const userId = await getUserId();
-    logger.info(`User ID retrieved Successfully`);
-    if (!userId) {
-      logger.warn("Unauthorized request to fetch clients");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const clients = await Client.find({ user: userId }).sort({ createdAt: -1 });
-    logger.info("Clients fetched successfully");
-    return NextResponse.json(clients, { status: 200 });
-  } catch (error) {
-    logger.error("Server error occurred while fetching clients", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
-  }
-}
-
 export async function DELETE(req: Request) {
   logger.info("Received request to delete clients");
   await connectDB();
@@ -84,5 +64,33 @@ export async function DELETE(req: Request) {
   } catch (error) {
     logger.error("Server error occurred while deleting clients", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> } ) {
+  logger.info(`Received request to fetch client with ID: `);
+  try{
+    const { id }= await params;
+    await connectDB();
+
+    const userId = await getUserId();
+    logger.info(`User ID retrieved Successfully`);
+    if (!userId) {
+      logger.warn("Unauthorized request to fetch client by ID");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const client = await Client.findOne({ _id: id, user: userId });
+    if (!client) {
+      logger.warn(`Client with ID: ${id} not found`);
+      return NextResponse.json({ error: "Client not found" }, { status: 404 });
+    }
+    
+    logger.info(`Client with ID: ${id} fetched successfully`);
+    return NextResponse.json(client, { status: 200 });
+
+  }catch(error){
+    logger.error("Server error occurred while fetching client by ID", error);
+    return NextResponse.json({ error: "Internal Server error in Fetching Client" }, { status: 500 });
   }
 }

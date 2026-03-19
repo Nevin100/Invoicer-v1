@@ -5,12 +5,11 @@ export const fetchClients = async (
   setClients: Dispatch<SetStateAction<Client[]>>,
 ) => {
   try {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    const res = await fetch(`/api/clients`, {
+    const res = await fetch("/api/clients", {
+      method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+         withCredentials: "include",
       },
     });
 
