@@ -6,6 +6,7 @@ import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import TopProgressBar from "@/components/TopProgressBar";
 import { useRouter } from "next/navigation";
+import { CreditProvider } from "@/lib/redux/CreditContext";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -48,6 +49,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, [isSidebarOpen]);
 
   return (
+    <CreditProvider>
+
     <div className="flex h-screen">
       <TopProgressBar />
 
@@ -87,5 +90,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         </div>
       </div>
     </div>
+    </CreditProvider>
   );
 }

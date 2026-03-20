@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 import { X, Calendar, Tag, FileText, IndianRupee, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CreditOverlay from "@/components/CreditOverlay";
+import { useCredits } from "@/lib/redux/CreditContext";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -21,7 +22,9 @@ const Page = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showCreditOverlay, setShowCreditOverlay] = useState(false);
   const [creditRemaining, setCreditRemaining] = useState(0);
-
+  const { deductOptimistic, rollback } = useCredits();
+  const EXPENSE_COST = 10; 
+  
   const handleSubmit = async () => {
     const { amount, currency, category, description, date } = expense;
 
@@ -57,6 +60,8 @@ const Page = () => {
     }
 
     setIsSubmitting(true);
+
+    deductOptimistic(EXPENSE_COST, "Expense Logged");
 
     try {
       const res = await fetch("/api/expenses", {

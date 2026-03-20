@@ -298,7 +298,7 @@ export default function InvoiceEditPage() {
       }
 
       setSent(true);
-      setTimeout(() => router.push("/dashboard/invoices"), 2500);
+      setTimeout(() => router.push("/invoices"), 2500);
     } catch {
       setError("Something went wrong. Try again.");
     } finally {

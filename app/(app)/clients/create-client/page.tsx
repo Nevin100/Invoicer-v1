@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import CreditOverlay from "@/components/CreditOverlay"; 
+import { useCredits } from "@/lib/redux/CreditContext";
 
 export default function NewClientForm() {
   const dispatch = useDispatch()
@@ -21,6 +22,8 @@ export default function NewClientForm() {
   const [country, setCountry] = useState(client.country)
   const [showCreditOverlay, setShowCreditOverlay] = useState(false);
   const [creditRemaining, setCreditRemaining] = useState(0);
+  const { deductOptimistic, rollback } = useCredits();
+  const CLIENT_COST = 10; 
 
   const handleChange = (field: string, value: string | number) => {
     dispatch(setClientField({ field: field as keyof typeof client, value }))
@@ -28,6 +31,9 @@ export default function NewClientForm() {
 
   const handleSubmit = async () => {
     setLoading(true)
+
+    deductOptimistic(CLIENT_COST, "Client Onboarded");
+
     try {
       const res = await fetch("/api/clients", {
         method: "POST",

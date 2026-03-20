@@ -13,10 +13,9 @@ import logger from "@/lib/logger";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
-// Sending invoice email with payment link and QR code generation, along with rate limiting and error handling. 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
 
@@ -25,41 +24,45 @@ export async function POST(
     await connectDB();
     const userId = await getUserId();
 
-    if (!userId){
+    if (!userId) {
       logger.warn("Unauthorized attempt to send invoice", { invoiceId: id });
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-      
+
     const rl = await withRateLimit(req, userId, "sensitive");
     if (rl) {
-      logger.warn("Rate limit exceeded for sending invoice", { invoiceId: id, userId });
+      logger.warn("Rate limit exceeded for sending invoice", {
+        invoiceId: id,
+        userId,
+      });
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
-        { status: 429 }
+        { status: 429 },
       );
-    };
+    }
 
     const invoice = await Invoice.findOne({ _id: id, user: userId }).populate(
       "client",
-      "clientName email phone address"
+      "clientName email phone address",
     );
 
-    if (!invoice){
+    if (!invoice) {
       logger.warn("Invoice not found", { invoiceId: id, userId });
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
-    if (!invoice.client?.email){  
-      logger.warn("Client has no email address", { invoiceId: id, userId })
+    if (!invoice.client?.email) {
+      logger.warn("Client has no email address", { invoiceId: id, userId });
       return NextResponse.json(
         { error: "Client has no email address" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const body = await req.json().catch(() => ({}));
     const businessName = body.businessName || "Your Business";
-    const businessEmail = body.businessEmail || process.env.RESEND_FROM_EMAIL || "";
+    const businessEmail =
+      body.businessEmail || process.env.RESEND_FROM_EMAIL || "";
 
     const paymentLink = await createPaymentLink({
       _id: invoice._id.toString(),
@@ -70,7 +73,8 @@ export async function POST(
       description: invoice.description,
     });
 
-    const qrBase64 = await generateQRBase64(paymentLink);
+    const encodedLink = encodeURIComponent(paymentLink);
+    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodedLink}&margin=10`;
 
     const html = invoiceEmailHTML({
       invoiceNumber: invoice.invoiceNumber,
@@ -82,13 +86,19 @@ export async function POST(
         year: "numeric",
       }),
       paymentLink,
-      qrCodeBase64: qrBase64,
+      qrCodeBase64: qrImageUrl,
       fromBusiness: businessName,
-      items: invoice.items,
+      accentColor: invoice.accentColor || "#0f0f0f",
+      items: invoice.items.map((item: any) => ({
+        name: item.name || "Unnamed Item",
+        quantity: item.quantity ?? 1,
+        rate: item.rate ?? 0,
+        amount: item.amount ?? (item.quantity ?? 1) * (item.rate ?? 0),
+      })),
     });
 
     const { error: resendError } = await resend.emails.send({
-      from: `${businessName} <invoices@invoicer.nevinbali.me>`,
+      from: `${businessName} <invoices@nevinbali.me>`,
       to: invoice.client.email,
       subject: `Invoice #${invoice.invoiceNumber} — ₹${invoice.totalAmount.toLocaleString("en-IN")} due ${new Date(invoice.dueDate).toLocaleDateString("en-IN")}`,
       html,
@@ -98,7 +108,7 @@ export async function POST(
       logger.error("Resend failed", { resendError, invoiceId: id });
       return NextResponse.json(
         { error: "Email delivery failed" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -123,10 +133,20 @@ export async function POST(
 
     return NextResponse.json({ success: true, paymentLink });
   } catch (error) {
-    logger.error("Invoice send failed", { error, invoiceId: id });
+    logger.error("Invoice send failed", {
+      invoiceId: id,
+      ...(error instanceof Error
+        ? {
+            errorMessage: error.message,
+            errorName: error.name,
+            errorStack: error.stack,
+            razorpayError: (error as any)?.error ?? null,
+          }
+        : { errorRaw: String(error) }),
+    });
     return NextResponse.json(
       { error: "Failed to send invoice" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -2,7 +2,24 @@ import winston from "winston";
 
 const { combine, timestamp, colorize, printf, json, errors } = winston.format;
 
+const serializeErrors = winston.format((info) => {
+  for (const key of Object.keys(info)) {
+    if (info[key] instanceof Error) {
+      const err = info[key] as Error;
+      info[key] = {
+        message: err.message,
+        name: err.name,
+        stack: err.stack,
+        ...(err as any).error,        
+        ...(err as any).response?.data, 
+      };
+    }
+  }
+  return info;
+});
+
 const devFormat = combine(
+  serializeErrors(),
   colorize({ all: true }),
   timestamp({ format: "DD-MM-YYYY HH:mm:ss" }),
   errors({ stack: true }),
@@ -13,6 +30,7 @@ const devFormat = combine(
 );
 
 const prodFormat = combine(
+  serializeErrors(),
   timestamp(),
   errors({ stack: true }),
   json()

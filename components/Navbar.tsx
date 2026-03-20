@@ -20,6 +20,7 @@ import { useDispatch } from "react-redux";
 import { logoutSuccess } from "@/lib/redux/Features/authSlice";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useCredits } from "@/lib/redux/CreditContext";
 
 function getCreditStyle(credits: number) {
   if (credits > 200)
@@ -44,7 +45,7 @@ function getCreditStyle(credits: number) {
 const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
   const dispatch = useDispatch();
   const router = useRouter();
-
+  const { credits } = useCredits();
   const [quickOpen, setQuickOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -53,11 +54,9 @@ const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
   const profileRef = useRef<HTMLDivElement>(null);
 
   const [username, setUsername] = useState("User");
-  const [credits, setCredits] = useState<number | null>(null);
   const [plan, setPlan] = useState<"starter" | "pro">("starter");
   const [initial, setInitial] = useState("U");
 
-  // ── Fetch user ──
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -66,12 +65,10 @@ const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
           const data = await res.json();
           const u = data.user;
           setUsername(u.username || u.name || "User");
-          setCredits(u.credits ?? null);
           setPlan(u.plan ?? "starter");
           setInitial((u.username || u.name || "U")[0].toUpperCase());
         }
       } catch {
-        /* silent */
       }
     };
     fetchUser();
@@ -88,7 +85,6 @@ const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // ── Logout ──
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {

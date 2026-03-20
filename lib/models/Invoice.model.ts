@@ -1,4 +1,3 @@
-// models/Invoice.model.ts
 import mongoose from "mongoose";
 
 const invoiceSchema = new mongoose.Schema(
@@ -34,6 +33,7 @@ const invoiceSchema = new mongoose.Schema(
       {
         name: { type: String, required: true },
         quantity: { type: Number, required: true },
+        amount: { type: Number, required: true },
         rate: { type: Number, required: true },
         ishourly: { type: Boolean, default: false },
       },
@@ -97,7 +97,7 @@ const invoiceSchema = new mongoose.Schema(
     },
 
     logo: {
-      type: String, // base64 string
+      type: String, 
       default: null,
     },
 

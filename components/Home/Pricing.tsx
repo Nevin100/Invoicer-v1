@@ -33,9 +33,9 @@ const PRO_FEATURES = [
 
 const CREDIT_COSTS = [
   { action: "Invoice", cost: 20, icon: "🧾" },
-  { action: "Client", cost: 5, icon: "👤" },
-  { action: "Expense", cost: 5, icon: "💸" },
-  { action: "AI Report", cost: 15, icon: "🤖" },
+  { action: "Client", cost: 10, icon: "👤" },
+  { action: "Expense", cost: 10, icon: "💸" },
+  { action: "AI Report", cost: 35, icon: "🤖" },
 ];
 
 export default function Pricing() {
