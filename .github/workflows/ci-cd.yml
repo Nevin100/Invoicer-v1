@@ -73,7 +73,7 @@ jobs:
         run: npm run build
 
   # Job 3: Docker Build & Push to Docker Hub
-  # Only runs on push to main (not PRs)
+  # Only runs on push to main (not PRs.)
   docker-build-and-push:
     name: Docker Build & Push
     runs-on: ubuntu-latest
