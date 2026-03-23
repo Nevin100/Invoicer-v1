@@ -114,7 +114,7 @@ jobs:
           cache-to:   type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/invoicer:buildcache,mode=max
 
   # Job 4: Deploy to Vercel
-  # Only runs on push to main, after successful build and Docker push. Uses Vercel CLI to deploy the app.
+  # Only runs on push to main, after successful build and Docker push. Uses Vercel CLI to deploy the application.
   deploy-vercel:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
