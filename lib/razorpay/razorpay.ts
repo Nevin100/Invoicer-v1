@@ -1,6 +1,6 @@
 import Razorpay from "razorpay";
 
-export const razorpay = new Razorpay({
+const getRazorpay = () => new Razorpay({
   key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
   key_secret: process.env.RAZORPAY_KEY_SECRET!,
 });
@@ -13,6 +13,7 @@ export async function createPaymentLink(invoice: {
   clientName: string;
   description?: string;
 }) {
+  const razorpay = getRazorpay(); 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   const linkPayload: any = {

@@ -5,7 +5,6 @@ import connectDB from "@/lib/database/db_connection";
 import Invoice from "@/lib/models/Invoice.model";
 import { getUserId } from "@/lib/helpers/getUserId";
 import { createPaymentLink } from "@/lib/razorpay/razorpay";
-import { generateQRBase64 } from "@/lib/razorpay/generateQR";
 import { invoiceEmailHTML } from "@/lib/emails/InvoiceEmail";
 import { cache } from "@/lib/Redis/cache";
 import { CacheKeys } from "@/lib/Redis/cacheKeys";
