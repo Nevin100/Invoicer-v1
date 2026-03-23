@@ -26,7 +26,7 @@ jobs:
         run: npm ci --frozen-lockfile
 
       - name: Run ESLint
-        run: npm run lint
+        run: npx eslint .
 
       - name: Run TypeScript type check
         run: npx tsc --noEmit
