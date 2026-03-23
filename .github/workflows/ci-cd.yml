@@ -2,7 +2,7 @@ name: Invoicer CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [main, development]
   pull_request:
     branches: [main]
 
