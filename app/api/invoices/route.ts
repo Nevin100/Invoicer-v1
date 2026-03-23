@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/database/db_connection";
@@ -30,8 +30,12 @@ export async function POST(req: NextRequest) {
     if (!success) {
       logger.warn("Insufficient credits to create an invoice");
       return NextResponse.json(
-        { error: "insufficient_credits", message: "Not enough credits to create an invoice", remaining },
-        { status: 402 }
+        {
+          error: "insufficient_credits",
+          message: "Not enough credits to create an invoice",
+          remaining,
+        },
+        { status: 402 },
       );
     }
 
@@ -45,7 +49,10 @@ export async function POST(req: NextRequest) {
       invoiceNumber: validated.invoiceNumber,
       issueDate: validated.issueDate,
       dueDate: validated.dueDate,
-      items: validated.items,
+      items: validated.items.map((item: any) => ({
+        ...item,
+        amount: item.amount ?? item.quantity * item.rate, // ← calculate karo
+      })),
       subTotal: validated.subTotal,
       discountPercent: validated.discountPercent,
       discountAmount: validated.discountAmount,
@@ -71,7 +78,10 @@ export async function POST(req: NextRequest) {
     if (error instanceof ZodError) {
       return NextResponse.json({ error: error.flatten() }, { status: 400 });
     }
-    return NextResponse.json({ error: error?.message ?? "Failed to create invoice" }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message ?? "Failed to create invoice" },
+      { status: 500 },
+    );
   }
 }
 
@@ -97,11 +107,14 @@ export async function GET(req: NextRequest) {
       .populate("client", "clientName email")
       .sort({ createdAt: -1 });
 
-    await cache.set(cacheKey, invoices, 60 * 3); 
+    await cache.set(cacheKey, invoices, 60 * 3);
 
     return NextResponse.json(invoices, { status: 200 });
   } catch (error: any) {
     logger.error("Server error occurred while fetching invoices", error);
-    return NextResponse.json({ error: "Failed to fetch invoices" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch invoices" },
+      { status: 500 },
+    );
   }
 }

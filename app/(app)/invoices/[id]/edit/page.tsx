@@ -44,8 +44,17 @@ const THEMES = [
   { name: "Rose", accent: "#e11d48", light: "#fff1f2", text: "#9f1239" },
   { name: "Amber", accent: "#d97706", light: "#fffbeb", text: "#92400e" },
   { name: "Slate", accent: "#475569", light: "#f8fafc", text: "#1e293b" },
+  { name: "Violet", accent: "#7c3aed", light: "#f5f3ff", text: "#5b21b6" },
+  { name: "Cyan", accent: "#0891b2", light: "#ecfeff", text: "#155e75" },
+  { name: "Coral", accent: "#f97316", light: "#fff7ed", text: "#9a3412" },
+  { name: "Navy", accent: "#1e3a8a", light: "#eff6ff", text: "#1e3a8a" },
+  { name: "Mint", accent: "#10b981", light: "#f0fdf4", text: "#065f46" },
+  { name: "Pink", accent: "#db2777", light: "#fdf2f8", text: "#9d174d" },
+  { name: "Teal", accent: "#0d9488", light: "#f0fdfa", text: "#134e4a" },
+  { name: "Gold", accent: "#b45309", light: "#fefce8", text: "#713f12" },
+  { name: "Crimson", accent: "#991b1b", light: "#fef2f2", text: "#7f1d1d" },
+  { name: "Plum", accent: "#6b21a8", light: "#faf5ff", text: "#581c87" },
 ];
-
 function InvoicePreview({
   invoice,
   logo,
