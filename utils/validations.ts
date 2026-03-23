@@ -78,7 +78,8 @@ export const invoiceSchema = z.object({
         name: z.string().min(1, "Item name is required"),
         quantity: z.coerce.number().positive("Quantity must be greater than 0"),
         rate: z.coerce.number().nonnegative("Rate cannot be negative"),
-        ishourly: z.boolean()
+        ishourly: z.boolean(),
+        amount: z.coerce.number().nonnegative().optional(), 
       })
     )
     .min(1, "At least one item is required"),

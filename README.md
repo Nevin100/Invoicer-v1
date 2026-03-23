@@ -6,7 +6,7 @@
 </p>
 
 > ⚡ A modern full-stack + GenAI - invoice & finance management platform  
-> 🚧 Currently ~85% complete and under active development
+> 🚧 Currently ~95% complete and under active development
 
 ---
 
@@ -38,7 +38,10 @@ The architecture is designed to evolve into a scalable SaaS-ready financial oper
 | Validation | Zod |
 | Authentication | JWT |
 | Payments | Razorpay |
+| CI/CD Pipelines | Github Actions | 
 | Deployment | Vercel |
+| Containerization | Dcoker |
+| Caching | Redis |
 
 ---
 
@@ -54,16 +57,15 @@ The architecture is designed to evolve into a scalable SaaS-ready financial oper
 | Excel Export | ✅ Completed |
 | Financial Analytics | ✅ Completed |
 | Invoice Creation | ✅ Completed |
-| Invoice Emailing | 🚧 In Progress |
-| Inventory Management | 🚧 In Progress |
-| RBAC | 🔜 Planned |
-| OAuth Integration | 🔜 Planned |
-| AI Insights | 🔜 Planned |
-| AI Report Generation | 🔜 Planned |
-| SAAS Service Credit System + Services Launc | 🔜 Planned and 🚧 In progress |
+| Invoice Emailing | ✅ Completed |
+| Inventory Management | ✅ Completed |
+| Google OAuth Integration | ✅ Completed |
+| SAAS Service Credit System + Services Launch | ✅ Completed  |
+| AI Insights | 🚧 In Progress |
+| AI Report Generation | 🚧 In Progress |
 
 
-**Overall Completion:** ~85%
+**Overall Completion:** ~95%
 
 ---
 
@@ -150,7 +152,7 @@ The architecture is designed to evolve into a scalable SaaS-ready financial oper
 
 ---
 
-# 🤖 Future Scope (AI-First Vision)
+# Future Scope (AI-First Vision)
 
 Planned AI capabilities:
 
