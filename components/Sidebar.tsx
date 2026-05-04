@@ -12,6 +12,7 @@ import {
   UserIcon
 } from "lucide-react"; 
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 interface SidebarProps {
   onLinkClick?: () => void;
@@ -49,9 +50,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onLinkClick }) => {
           <div className="relative w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
              <Image src="/favicon.ico" alt="Logo" width={24} height={24} />
           </div>
-          <span className="text-2xl font-black tracking-tighter text-indigo-900">
+          <Link href="/">
+            <span className="text-2xl font-black tracking-tighter text-indigo-900">
             Invoicer
           </span>
+          </Link>
         </div>
 
         {/* Navigation Menu */}
