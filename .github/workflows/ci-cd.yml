@@ -68,6 +68,8 @@ jobs:
           INVOICER_COUPONS=DUMMY100:100
           NEXT_PUBLIC_APP_URL=http://localhost:3000
           NODE_ENV=production
+          GROQ_API_KEY=gsk_dummy
+          TAVILY_API_KEY=tvly_dummy
           EOF
 
       - name: Build Next.js app
