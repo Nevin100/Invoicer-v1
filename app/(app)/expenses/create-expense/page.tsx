@@ -134,7 +134,7 @@ const Page = () => {
         </div>
 
         <div className="p-8 md:p-10 space-y-8">
-          <div className="space-y-3 group">
+          {/* <div className="space-y-3 group">
             <Label title="Receipt / Attachment" />
             <div className="w-full h-32 bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 transition-all group">
               <div className="relative w-12 h-12 mb-2 group-hover:scale-110 transition-transform">
@@ -149,7 +149,7 @@ const Page = () => {
                 Click to Upload Proof
               </span>
             </div>
-          </div>
+          </div> */}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="md:col-span-2 flex flex-col sm:flex-row gap-4">

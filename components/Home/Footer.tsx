@@ -23,9 +23,9 @@ export default function Footer() {
               <div>
                 <div className="flex items-center gap-4 mb-8">
                   <div className="w-14 h-14 bg-indigo-600 rounded-[1.25rem] flex items-center justify-center text-white text-3xl font-black italic shadow-2xl shadow-indigo-500/40">i</div>
-                  <span className="text-4xl font-black text-white tracking-tighter">Invoicer.</span>
+                  <span className="text-3xl font-black text-white tracking-tighter">Invoicer.</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-slate-400 leading-[1.1] tracking-tight">
+                <h2 className="text-xl md:text-2xl font-bold text-slate-400 leading-[1.1] tracking-tight">
                   The financial operating system <br />
                   <span className="text-white underline decoration-indigo-500/30 underline-offset-8">for the elite freelancer.</span>
                 </h2>
@@ -71,18 +71,18 @@ export default function Footer() {
 
         {/* Exclusive Bottom Bar */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 items-center px-4">
-          <div className="text-[15px] font-black text-slate-400 uppercase tracking-widest order-2 md:order-1">
+          <div className="text-[11px] font-black text-slate-400 uppercase tracking-widest order-2 md:order-1">
             © {currentYear} Invoicer Studio — All Rights Reserved
           </div>
           
           <div className="flex justify-center order-1 md:order-2">
             <div className="px-4 py-2 bg-white border border-slate-100 rounded-full flex items-center gap-3 shadow-sm">
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping" />
-              <span className="text-[14px] font-black text-slate-600 uppercase tracking-tighter">API Status: Operational</span>
+              <span className="text-[11px] font-black text-slate-600 uppercase tracking-tighter">API Status: Operational</span>
             </div>
           </div>
 
-          <div className="text-[15px] font-black text-slate-400 uppercase tracking-widest text-right order-3">
+          <div className="text-[11px] font-black text-slate-400 uppercase tracking-widest text-right order-3">
             Handcrafted by <a href="https://www.nevinbali.me" className="text-indigo-600 hover:underline cursor-pointer">Nevin Bali</a>
           </div>
         </div>

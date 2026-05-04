@@ -5,7 +5,18 @@ export const CREDIT_COSTS = {
   INVOICE: 20,
   CLIENT: 5,
   EXPENSE: 5,
-  AI_EVAL: 15,
+  AI_EVAL_EXPENSE:  15,   
+  AI_EVAL_INVOICE:  15,   
+  AI_EVAL_CLIENT:   15,  
+  AI_EVAL_COMPLETE: 35,
+
+} as const;
+
+export const EVAL_CREDIT_MAP = {
+  expense:  "AI_EVAL_EXPENSE",
+  invoice:  "AI_EVAL_INVOICE",
+  client:   "AI_EVAL_CLIENT",
+  complete: "AI_EVAL_COMPLETE",
 } as const;
 
 export type CreditAction = keyof typeof CREDIT_COSTS;
