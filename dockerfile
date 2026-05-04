@@ -31,6 +31,8 @@ ENV JWT_SECRET=dummysecretdummysecretdummysecret32
 ENV RESEND_API_KEY=re_dummy
 ENV GOOGLE_CLIENT_ID=dummy
 ENV GOOGLE_CLIENT_SECRET=dummy
+ENV GROQ_API_KEY=gsk_dummy
+ENV TAVILY_API_KEY=tvly_dummy
 
 RUN npm run build
 
