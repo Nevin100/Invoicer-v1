@@ -6,8 +6,6 @@
 </p>
 
 > ⚡ A modern full-stack + GenAI - invoice & finance management platform  
-> 🚧 Currently ~95% complete and under active development
-
 ---
 
 # 📌 Overview
@@ -22,7 +20,7 @@ It provides a complete workflow for:
 - Secure online payments  
 - Financial analytics dashboard  
 - Structured data exports  
-
+- Ai Eval Reports + Insights using Tavilly API + Groq API
 The architecture is designed to evolve into a scalable SaaS-ready financial operating system.
 
 ---
@@ -40,7 +38,7 @@ The architecture is designed to evolve into a scalable SaaS-ready financial oper
 | Payments | Razorpay |
 | CI/CD Pipelines | Github Actions | 
 | Deployment | Vercel |
-| Containerization | Dcoker |
+| Containerization | Docker |
 | Caching | Redis |
 
 ---
@@ -61,11 +59,9 @@ The architecture is designed to evolve into a scalable SaaS-ready financial oper
 | Inventory Management | ✅ Completed |
 | Google OAuth Integration | ✅ Completed |
 | SAAS Service Credit System + Services Launch | ✅ Completed  |
-| AI Insights | 🚧 In Progress |
-| AI Report Generation | 🚧 In Progress |
-
-
-**Overall Completion:** ~95%
+| AI Insights | ✅ Completed |
+| AI Report Generation | ✅ Completed |
+| AI Export Feature + History | ✅ Completed |
 
 ---
 
@@ -152,17 +148,13 @@ The architecture is designed to evolve into a scalable SaaS-ready financial oper
 
 ---
 
-# Future Scope (AI-First Vision)
+## 📱 AI capabilities:
 
-Planned AI capabilities:
-
-- Automatic expense categorization
 - Spending pattern analysis
 - Financial anomaly detection
 - Predictive cash-flow insights
-- Intelligent invoice reminders
 
-Goal: Transform Invoicer into a smart financial assistant.
+Goal: Transform Invoicer into a smart financial insight assistant.
 
 ---
 
@@ -205,6 +197,9 @@ Goal: Transform Invoicer into a smart financial assistant.
 <img width="1366" height="594" alt="image" src="https://github.com/user-attachments/assets/9cb7f1ab-75a5-4908-8c1e-9eefd3547182" />
 <img width="1366" height="604" alt="image" src="https://github.com/user-attachments/assets/2d402da8-4c1c-4373-8764-6c020a22521b" />
 <img width="1357" height="610" alt="image" src="https://github.com/user-attachments/assets/4b1878d5-0335-4819-8bf8-86817234f464" />
+<img width="1366" height="637" alt="image" src="https://github.com/user-attachments/assets/00386b2d-5f7c-4232-9fc3-07d3a930aa32" />
+<img width="1358" height="630" alt="image" src="https://github.com/user-attachments/assets/f4bb330b-eae0-4088-81a1-521c8d7a46bd" />
+<img width="1363" height="641" alt="image" src="https://github.com/user-attachments/assets/bf685a91-a8d7-4d82-a81a-e294fd69c442" />
 
 
 # ⚙️ Installation & Setup
