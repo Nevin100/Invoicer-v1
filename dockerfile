@@ -20,7 +20,7 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-
+# 
 ENV NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_dummy
 ENV NEXT_PUBLIC_APP_URL=http://localhost:3000
 ENV RAZORPAY_KEY_SECRET=dummy
@@ -31,6 +31,8 @@ ENV JWT_SECRET=dummysecretdummysecretdummysecret32
 ENV RESEND_API_KEY=re_dummy
 ENV GOOGLE_CLIENT_ID=dummy
 ENV GOOGLE_CLIENT_SECRET=dummy
+ENV GROQ_API_KEY=gsk_dummy
+ENV TAVILY_API_KEY=tvly_dummy
 
 RUN npm run build
 
