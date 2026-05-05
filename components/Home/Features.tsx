@@ -13,8 +13,10 @@ import {
   FiFolder,
   FiGrid,
 } from "react-icons/fi";
+import { useState } from "react";
 
 export default function Features() {
+  const [lightbox, setLightbox] = useState<string | null>(null);
   return (
     <section id="features" className="py-24 px-6 bg-[#fcfcfd] font-['Archivo']">
       <div className="max-w-7xl mx-auto">
@@ -308,28 +310,37 @@ export default function Features() {
                 </div>
 
                 {/* Screenshot strip */}
-                <div className="mt-8 flex gap-3 overflow-hidden">
-                  <div className="flex-shrink-0 w-48 h-28 bg-white/5 rounded-2xl border border-white/10 overflow-hidden">
-                    <img
-                      src="/ai-eval-generate.jpg"
-                      alt="Generate"
-                      className="w-full h-full object-cover object-top opacity-80 group-hover:opacity-100 transition-opacity"
-                    />
-                  </div>
-                  <div className="flex-shrink-0 w-48 h-28 bg-white/5 rounded-2xl border border-white/10 overflow-hidden">
-                    <img
-                      src="/ai-eval-history.jpg"
-                      alt="History"
-                      className="w-full h-full object-cover object-top opacity-80 group-hover:opacity-100 transition-opacity"
-                    />
-                  </div>
-                  <div className="flex-shrink-0 w-48 h-28 bg-white/5 rounded-2xl border border-white/10 overflow-hidden">
-                    <img
-                      src="/ai-eval-report.jpg"
-                      alt="Report"
-                      className="w-full h-full object-cover object-top opacity-80 group-hover:opacity-100 transition-opacity"
-                    />
-                  </div>
+                <div className="mt-8 grid grid-cols-3 gap-3">
+                  {[
+                    { src: "/ai-eval-generate.jpg", label: "Generate Report" },
+                    { src: "/ai-eval-history.jpg", label: "Report History" },
+                    { src: "/ai-eval-report.jpg", label: "Full Report" },
+                  ].map(({ src, label }) => (
+                    <div
+                      key={label}
+                      onClick={() => setLightbox(src)}
+                      className="group/img relative rounded-2xl overflow-hidden border border-white/10 bg-white/5 hover:border-indigo-400/50 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl hover:shadow-indigo-500/20 cursor-zoom-in"
+                    >
+                      <div className="flex items-center gap-1.5 px-3 py-2 bg-white/10 border-b border-white/10">
+                        <span className="w-2 h-2 rounded-full bg-rose-400/70" />
+                        <span className="w-2 h-2 rounded-full bg-amber-400/70" />
+                        <span className="w-2 h-2 rounded-full bg-emerald-400/70" />
+                        <div className="flex-1 mx-2 h-3 bg-white/10 rounded-full" />
+                      </div>
+                      <div className="aspect-[16/10] overflow-hidden">
+                        <img
+                          src={src}
+                          alt={label}
+                          className="w-full h-full object-contain object-top opacity-80 group-hover/img:opacity-100 group-hover/img:scale-105 transition-all duration-500"
+                        />
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-gradient-to-t from-black/60 to-transparent">
+                        <p className="text-[9px] font-black uppercase tracking-wider text-white/80">
+                          {label}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -724,6 +735,32 @@ export default function Features() {
           </div>
         </div>
       </div>
+      {/* Lightbox */}
+      {lightbox && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setLightbox(null)}
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 cursor-zoom-out"
+        >
+          <motion.img
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            src={lightbox}
+            alt="Preview"
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-5xl w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border border-white/10"
+          />
+          <button
+            onClick={() => setLightbox(null)}
+            className="absolute top-6 right-6 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors text-lg font-black"
+          >
+            ✕
+          </button>
+        </motion.div>
+      )}
     </section>
   );
 }
