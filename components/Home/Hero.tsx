@@ -37,10 +37,10 @@ export default function Hero() {
                   </div>
                 ))}
               </div>
-              <span className="text-[13px] font-semibold text-slate-600 tracking-tight">
+              {/* <span className="text-[13px] font-semibold text-slate-600 tracking-tight">
                 Joined by <span className="text-indigo-600">2.4k+</span>{" "}
                 professionals
-              </span>
+              </span> */}
             </div>
 
             <h1 className="text-5xl md:text-6xl lg:text-[72px] font-black leading-[1] tracking-[-0.03em] text-slate-900">
