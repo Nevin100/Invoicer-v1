@@ -10,12 +10,15 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
 
   return (
     <>
@@ -27,11 +30,10 @@ export default function Navbar() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex justify-between items-center">
-          
+
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            
-              <Image src={"/favicon.ico"} alt="Logo" width={34} height={34} className="block" />
+            <Image src="/favicon.ico" alt="Logo" width={34} height={34} className="block" />
             <h1 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
               Invoicer
             </h1>
@@ -50,39 +52,64 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setOpen(!open)}
-            className="md:hidden text-slate-700"
+            className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-700 active:scale-95 transition-transform"
           >
-            {open ? <FiX size={24} /> : <FiMenu size={24} />}
+            {open ? <FiX size={20} /> : <FiMenu size={20} />}
           </button>
         </div>
       </nav>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Bottom Sheet */}
       <div
-        className={`fixed inset-0 z-40 transition-all duration-300 ${
-          open ? "opacity-100 visible" : "opacity-0 invisible"
+        className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${
+          open ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
         }`}
       >
         {/* Overlay */}
         <div
           onClick={() => setOpen(false)}
-          className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         />
 
-        {/* Drawer Panel */}
+        {/* Bottom Sheet Panel */}
         <div
-          className={`absolute top-0 right-0 w-72 h-full bg-white shadow-2xl p-8 flex flex-col gap-8 transform transition-transform duration-300 ${
-            open ? "translate-x-0" : "translate-x-full"
+          className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-[2rem] shadow-2xl px-8 pt-6 pb-10 flex flex-col gap-6 transform transition-transform duration-300 ease-out ${
+            open ? "translate-y-0" : "translate-y-full"
           }`}
         >
-          <Link href="/" onClick={() => setOpen(false)} className="font-bold text-xl">
-            Invoicer
-          </Link>
+          {/* Handle */}
+          <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto" />
 
+          {/* Brand */}
+          <div className="flex items-center gap-2">
+            <Image src="/favicon.ico" alt="Logo" width={28} height={28} />
+            <span className="font-black text-lg bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
+              Invoicer
+            </span>
+          </div>
 
+          {/* Nav Links */}
+          <div className="flex flex-col gap-1">
+            {[
+              { label: "Features", href: "/#features" },
+              { label: "Pricing", href: "/#pricing" },
+            ].map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
+                onClick={() => setOpen(false)}
+                className="px-4 py-3 rounded-xl text-slate-700 font-semibold hover:bg-slate-50 active:bg-slate-100 transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+
+          {/* CTA */}
           <Link href="/login" onClick={() => setOpen(false)}>
-            <button className="mt-auto bg-indigo-600 text-white py-3 rounded-xl font-semibold">
+            <button className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 group active:scale-95 transition-transform cursor-pointer">
               Get Started
+              <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
             </button>
           </Link>
         </div>
