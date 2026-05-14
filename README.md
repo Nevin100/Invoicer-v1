@@ -2,7 +2,6 @@
 
 <p align="center">
   <img width="1356" height="599" alt="image" src="https://github.com/user-attachments/assets/bc45767c-6e3d-4e3b-abb4-8f2675c35aa4" />
-/>
 </p>
 
 > ⚡ A modern full-stack + GenAI - invoice & finance management platform  
