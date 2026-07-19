@@ -70,6 +70,8 @@ jobs:
           NODE_ENV=production
           GROQ_API_KEY=gsk_dummy
           TAVILY_API_KEY=tvly_dummy
+          VERCEL_OIDC_TOKEN=vercel_dummy
+
           EOF
 
       - name: Build Next.js app
