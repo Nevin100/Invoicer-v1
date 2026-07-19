@@ -24,7 +24,7 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci --frozen-lockfile
+        run: npm ci
 
       - name: Run TypeScript type check
         run: npx tsc --noEmit
@@ -70,7 +70,6 @@ jobs:
           NODE_ENV=production
           GROQ_API_KEY=gsk_dummy
           TAVILY_API_KEY=tvly_dummy
-
           EOF
 
       - name: Build Next.js app
