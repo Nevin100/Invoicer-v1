@@ -9,7 +9,6 @@ export async function GET() {
   await connectDB();
   try {
     const userId = await getUserId();
-    logger.info(`User ID retrieved Successfully: ${userId}`);
     if (!userId) {
       logger.warn("Unauthorized request to fetch user profile");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -34,7 +33,6 @@ export async function POST(req: Request) {
   await connectDB();
   try {
     const userId = await getUserId();
-    logger.info(`User ID retrieved Successfully: ${userId}`);
     if (!userId) {
       logger.warn("Unauthorized request to create user profile");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -43,7 +41,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const existing = await Profile.findOne({ user: userId });
     if (existing) {
-      logger.warn("Request to create user profile failed: Profile already exists");
       return NextResponse.json({ error: "Profile already exists" }, { status: 400 });
     }
 
@@ -61,7 +58,6 @@ export async function PATCH(req: Request) {
   await connectDB();
   try {
     const userId = await getUserId();
-    logger.info(`User ID retrieved Successfully: ${userId}`);
     if (!userId) {
       logger.warn("Unauthorized request to update user profile");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -74,25 +70,26 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "pageNumber and data required" }, { status: 400 });
     }
 
-    const updatePayload: any = {
-      [`page${pageNumber}`]: data,
-    };
-
     const profile = await Profile.findOneAndUpdate(
       { user: userId },
       {
-        $set: updatePayload,
+        $set: { [`page${pageNumber}`]: data },
         $addToSet: { completedPages: pageNumber },
       },
       { new: true, upsert: true }
     );
 
-    if (profile.completedPages.length === 4) {
+    const mandatoryPages = [1, 2, 3, 4];
+    const allMandatoryDone = mandatoryPages.every(p =>
+      profile.completedPages.includes(p)
+    );
+
+    if (allMandatoryDone && !profile.isComplete) {
       profile.isComplete = true;
       await profile.save();
     }
 
-    logger.info("User profile updated successfully");
+    logger.info(`Profile page ${pageNumber} updated for user ${userId}`);
     return NextResponse.json({ message: `Page ${pageNumber} saved`, profile });
   } catch (error) {
     logger.error("Server error occurred while updating user profile", error);
