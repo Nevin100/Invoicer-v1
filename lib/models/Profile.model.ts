@@ -1,4 +1,3 @@
-// lib/models/Profile.model.ts
 import mongoose from "mongoose";
 
 const profileSchema = new mongoose.Schema({
@@ -9,7 +8,6 @@ const profileSchema = new mongoose.Schema({
     unique: true,
   },
 
-  // ─── PAGE 1: Basic Identity ───────────────────────────
   page1: {
     fullName: { type: String, required: true },
     avatar: { type: String },
@@ -24,7 +22,6 @@ const profileSchema = new mongoose.Schema({
     tagline: { type: String },    
   },
 
-  // ─── PAGE 2: Business Info ────────────────────────────
   page2: {
     companyName: { type: String },
     companyType: {
@@ -47,7 +44,6 @@ const profileSchema = new mongoose.Schema({
     gstin: { type: String },
   },
 
-  // ─── PAGE 3: Financial Context (AI ke liye) ──────────
   page3: {
     monthlyRevenueRange: {
       type: String,
@@ -80,7 +76,6 @@ const profileSchema = new mongoose.Schema({
     dailyBusinessScale: { type: String }, 
   },
 
-  // ─── PAGE 4: Background & Achievements ───────────────
   page4: {
     education: {
       degree: { type: String },
@@ -95,8 +90,22 @@ const profileSchema = new mongoose.Schema({
       type: String, 
     },
   },
+  
+  page5: {
+    preferredMethod: {
+      type: String,
+      enum: ["upi", "bank", "both"],
+      default: "upi",
+    },
+    upiId:       { type: String },   
+    accountName: { type: String },   
+    accountNo:   { type: String },   
+    ifsc:        { type: String },   
+    bankName:    { type: String },   
+    qrCode:      { type: String },
+    branchName:  { type: String },
+  },
 
-  // ─── Meta ─────────────────────────────────────────────
   completedPages: {
     type: [Number],
     default: [],

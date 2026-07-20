@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/database/db_connection";
 import Invoice from "@/lib/models/Invoice.model";
+import Profile from "@/lib/models/Profile.model";
 import { invoiceSchema } from "@/utils/validations";
 import { ZodError } from "zod";
 import { getUserId } from "@/lib/helpers/getUserId";
@@ -17,7 +18,6 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const userId = await getUserId();
-    logger.info(`User ID retrieved Successfully: ${userId}`);
     if (!userId) {
       logger.warn("Unauthorized request to create invoice");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -26,15 +26,26 @@ export async function POST(req: NextRequest) {
     const rl = await withRateLimit(req, userId, "general");
     if (rl) return rl;
 
+    const profile = await Profile.findOne({ user: userId }).lean() as any;
+    const p5 = profile?.page5;
+    const hasPaymentDetails = p5 && (p5.upiId || p5.accountNo);
+
+    if (!hasPaymentDetails) {
+      logger.warn("Invoice creation blocked — payment details not configured", { userId });
+      return NextResponse.json(
+        {
+          error: "payment_details_missing",
+          message: "Please configure your payment details in your profile before creating an invoice.",
+        },
+        { status: 403 },
+      );
+    }
+
     const { success, remaining } = await deductCredits(userId, "INVOICE");
     if (!success) {
       logger.warn("Insufficient credits to create an invoice");
       return NextResponse.json(
-        {
-          error: "insufficient_credits",
-          message: "Not enough credits to create an invoice",
-          remaining,
-        },
+        { error: "insufficient_credits", message: "Not enough credits to create an invoice", remaining },
         { status: 402 },
       );
     }
@@ -42,6 +53,17 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { status, ...payload } = body;
     const validated = invoiceSchema.parse(payload);
+
+    const paymentDetailsSnapshot = {
+      preferredMethod: p5.preferredMethod ?? "upi",
+      upiId:          p5.upiId       ?? null,
+      qrCode:         p5.qrCode      ?? null,
+      accountName:    p5.accountName ?? null,
+      accountNo:      p5.accountNo   ?? null,
+      ifsc:           p5.ifsc        ?? null,
+      bankName:       p5.bankName    ?? null,
+      branchName:     p5.branchName  ?? null,
+    };
 
     const invoice = await Invoice.create({
       user: userId,
@@ -51,7 +73,7 @@ export async function POST(req: NextRequest) {
       dueDate: validated.dueDate,
       items: validated.items.map((item: any) => ({
         ...item,
-        amount: item.amount ?? item.quantity * item.rate, // ← calculate karo
+        amount: item.amount ?? item.quantity * item.rate,
       })),
       subTotal: validated.subTotal,
       discountPercent: validated.discountPercent,
@@ -64,6 +86,7 @@ export async function POST(req: NextRequest) {
       isRecurring: validated.isRecurring,
       recurringPeriod: validated.recurringPeriod,
       status: status ?? "Draft",
+      paymentDetails: paymentDetailsSnapshot, // ✅ snapshot
     });
 
     await Promise.all([
@@ -71,7 +94,7 @@ export async function POST(req: NextRequest) {
       cache.del(CacheKeys.analytics(userId)),
     ]);
 
-    logger.info("New invoice created successfully");
+    logger.info("New invoice created successfully", { userId, invoiceId: invoice._id });
     return NextResponse.json(invoice, { status: 201 });
   } catch (error: any) {
     logger.error("Server error occurred while creating invoice", error);
@@ -90,7 +113,6 @@ export async function GET(req: NextRequest) {
   try {
     await connectDB();
     const userId = await getUserId();
-    logger.info(`User ID retrieved Successfully: ${userId}`);
     if (!userId) {
       logger.warn("Unauthorized request to fetch invoices");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -108,13 +130,9 @@ export async function GET(req: NextRequest) {
       .sort({ createdAt: -1 });
 
     await cache.set(cacheKey, invoices, 60 * 3);
-
     return NextResponse.json(invoices, { status: 200 });
   } catch (error: any) {
     logger.error("Server error occurred while fetching invoices", error);
-    return NextResponse.json(
-      { error: "Failed to fetch invoices" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch invoices" }, { status: 500 });
   }
 }

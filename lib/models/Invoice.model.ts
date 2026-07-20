@@ -2,32 +2,15 @@ import mongoose from "mongoose";
 
 const invoiceSchema = new mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     client: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Client",
       required: true,
     },
-
-    invoiceNumber: {
-      type: String,
-      required: true,
-    },
-
-    issueDate: {
-      type: Date,
-      required: true,
-    },
-
-    dueDate: {
-      type: Date,
-      required: true,
-    },
+    invoiceNumber: { type: String, required: true },
+    issueDate: { type: Date, required: true },
+    dueDate: { type: Date, required: true },
 
     items: [
       {
@@ -39,41 +22,14 @@ const invoiceSchema = new mongoose.Schema(
       },
     ],
 
-    subTotal: {
-      type: Number,
-      required: true,
-    },
+    subTotal: { type: Number, required: true },
+    discountPercent: { type: Number, default: 0 },
+    discountAmount: { type: Number, default: 0 },
+    taxPercent: { type: Number, default: 0 },
+    taxAmount: { type: Number, default: 0 },
+    totalAmount: { type: Number, required: true },
 
-    discountPercent: {
-      type: Number,
-      default: 0,
-    },
-
-    discountAmount: {
-      type: Number,
-      default: 0,
-    },
-
-    taxPercent: {
-      type: Number,
-      default: 0,
-    },
-
-    taxAmount: {
-      type: Number,
-      default: 0,
-    },
-
-    totalAmount: {
-      type: Number,
-      required: true,
-    },
-
-    description: {
-      type: String,
-      default: "",
-    },
-
+    description: { type: String, default: "" },
     termsAndConditions: {
       type: String,
       default: "Please pay within 15 days from the date of invoice.",
@@ -84,41 +40,28 @@ const invoiceSchema = new mongoose.Schema(
       enum: ["Draft", "Sent", "Paid", "Overdue"],
       default: "Draft",
     },
-
-    isRecurring: {
-      type: Boolean,
-      default: false,
-    },
-
+    isRecurring: { type: Boolean, default: false },
     recurringPeriod: {
       type: String,
       enum: ["Monthly", "Weekly", "Quarterly", "Yearly"],
       default: "Monthly",
     },
 
-    logo: {
-      type: String, 
-      default: null,
-    },
+    logo: { type: String, default: null },
+    accentColor: { type: String, default: "#0f0f0f" },
+    paymentLink: { type: String, default: null },
+    sentAt: { type: Date, default: null },
+    paidAt: { type: Date, default: null },
 
-    accentColor: {
-      type: String,
-      default: "#0f0f0f",
-    },
-
-    paymentLink: {
-      type: String,
-      default: null,
-    },
-
-    sentAt: {
-      type: Date,
-      default: null,
-    },
-
-    paidAt: {
-      type: Date,
-      default: null,
+    paymentDetails: {
+      preferredMethod: { type: String },
+      upiId: { type: String },
+      qrCode: { type: String },
+      accountName: { type: String },
+      accountNo: { type: String },
+      ifsc: { type: String },
+      bankName: { type: String },
+      branchName: { type: String },
     },
   },
   { timestamps: true },

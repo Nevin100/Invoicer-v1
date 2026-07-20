@@ -25,6 +25,9 @@ import {
   Mail,
   Phone,
   User,
+  CreditCard,
+  AlertTriangle,
+  ArrowRight,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { invoiceSchema, InvoiceInput } from "@/utils/validations";
@@ -57,6 +60,7 @@ import {
 import { useRouter } from "next/navigation";
 import CreditOverlay from "@/components/CreditOverlay";
 import { useCredits } from "@/lib/redux/CreditContext";
+import Link from "next/link";
 
 export interface Client {
   _id: string;
@@ -75,7 +79,7 @@ function BilledToClientDetails({
 }: {
   selectedClientDetails: Client | null;
 }) {
-  if (!selectedClientDetails) {
+  if (!selectedClientDetails)
     return (
       <div className="flex flex-col items-center justify-center py-8 gap-2 text-slate-300">
         <User size={32} strokeWidth={1.5} />
@@ -84,8 +88,6 @@ function BilledToClientDetails({
         </p>
       </div>
     );
-  }
-
   const {
     clientName,
     companyName,
@@ -96,8 +98,6 @@ function BilledToClientDetails({
     country,
     postal,
   } = selectedClientDetails;
-  const countryTelephoneCode = getTelephoneCode(country);
-
   return (
     <div className="space-y-4">
       <div>
@@ -136,10 +136,45 @@ function BilledToClientDetails({
               <Phone size={11} className="text-slate-500" />
             </div>
             <p className="text-[12px] text-slate-600 font-medium">
-              {countryTelephoneCode} {mobile}
+              {getTelephoneCode(country)} {mobile}
             </p>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ✅ Shown when payment details not configured
+function PaymentDetailsMissingBanner() {
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white border border-amber-100 rounded-[2.5rem] shadow-sm overflow-hidden">
+        <div className="h-2 w-full bg-amber-400" />
+        <div className="p-10 flex flex-col items-center text-center gap-6">
+          <div className="w-20 h-20 bg-amber-50 rounded-[2rem] flex items-center justify-center">
+            <AlertTriangle size={36} className="text-amber-500" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+              Payment Details Missing
+            </h2>
+            <p className="text-sm font-bold text-slate-500 leading-relaxed">
+              Before creating an invoice, add your UPI ID or bank account
+              details in your profile. These appear on every invoice so clients
+              know how to pay you.
+            </p>
+          </div>
+          <Link href="/profile" className="w-full">
+            <button className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 hover:bg-amber-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg">
+              <CreditCard size={15} /> Go to Profile — Add Payment Details{" "}
+              <ArrowRight size={15} />
+            </button>
+          </Link>
+          <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+            Takes less than a minute
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -151,10 +186,14 @@ const CreateInvoiceForm = () => {
   const router = useRouter();
   const [showCreditOverlay, setShowCreditOverlay] = useState(false);
   const [creditRemaining, setCreditRemaining] = useState(0);
-
   const [savingDraft, setSavingDraft] = useState(false);
-  const { deductOptimistic, rollback } = useCredits();
-  const INVOICE_COST = 20; 
+
+  // ✅ Payment details pre-check
+  const [paymentChecked, setPaymentChecked] = useState(false);
+  const [hasPaymentDetails, setHasPaymentDetails] = useState(true);
+
+  const { deductOptimistic } = useCredits();
+  const INVOICE_COST = 20;
 
   const form = useForm<InvoiceInput>({
     resolver: zodResolver(invoiceSchema),
@@ -183,6 +222,16 @@ const CreateInvoiceForm = () => {
   });
 
   useEffect(() => {
+    // Fetch profile page5 to check payment details
+    fetch("/api/profile", { credentials: "include" })
+      .then((r) => r.json())
+      .then((d) => {
+        const p5 = d?.profile?.page5;
+        setHasPaymentDetails(!!(p5 && (p5.upiId || p5.accountNo)));
+      })
+      .catch(() => setHasPaymentDetails(true)) // fail open — API will block anyway
+      .finally(() => setPaymentChecked(true));
+
     fetchClients(setClients);
   }, []);
 
@@ -214,29 +263,28 @@ const CreateInvoiceForm = () => {
 
   const handleNext = async () => {
     setSavingDraft(true);
-
     deductOptimistic(INVOICE_COST, "Invoice created");
-    
     try {
       const values = form.getValues();
-
       const itemsWithAmount = values.items.map((item) => ({
         ...item,
         amount: uptoTwoDecimalPlaces((item.quantity ?? 1) * (item.rate ?? 0)),
       }));
-
       const res = await axios.post(
         "/api/invoices",
         { ...values, items: itemsWithAmount, status: "Draft" },
         { withCredentials: true },
       );
-
       const invoiceId = (res.data as { _id: string })._id;
       router.push(`/invoices/${invoiceId}/edit`);
     } catch (error: any) {
       if (error?.response?.status === 402) {
         setCreditRemaining(error.response.data?.remaining ?? 0);
         setShowCreditOverlay(true);
+        return;
+      }
+      if (error?.response?.data?.error === "payment_details_missing") {
+        setHasPaymentDetails(false); // show banner
         return;
       }
       Swal.fire("Error", "Failed to save draft", "error");
@@ -260,9 +308,24 @@ const CreateInvoiceForm = () => {
         setShowCreditOverlay(true);
         return;
       }
+      if (error?.response?.data?.error === "payment_details_missing") {
+        setHasPaymentDetails(false);
+        return;
+      }
       Swal.fire("Error", "Failed to send invoice", "error");
     }
   };
+
+  // Loading
+  if (!paymentChecked)
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-10 h-10 border-4 border-slate-100 border-t-indigo-600 rounded-full animate-spin" />
+      </div>
+    );
+
+  // Block
+  if (!hasPaymentDetails) return <PaymentDetailsMissingBanner />;
 
   return (
     <>
@@ -281,8 +344,6 @@ const CreateInvoiceForm = () => {
                 Generate professional billing
               </p>
             </div>
-
-            {/* ── CHANGED: 2 buttons → Save Draft + Next ── */}
             <div className="flex gap-3 w-full md:w-auto">
               <Button
                 type="button"
@@ -294,7 +355,6 @@ const CreateInvoiceForm = () => {
                 <Save className="mr-2 w-4 h-4" />
                 {savingDraft ? "Saving..." : "Save Draft"}
               </Button>
-
               <Button
                 type="button"
                 onClick={handleNext}
@@ -303,7 +363,6 @@ const CreateInvoiceForm = () => {
               >
                 {savingDraft ? "Saving..." : "Next →"}
               </Button>
-
               <Button
                 type="submit"
                 className="flex-1 md:flex-none rounded-2xl bg-slate-900 font-black text-[10px] uppercase tracking-widest py-6 px-8 hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200"
@@ -313,7 +372,7 @@ const CreateInvoiceForm = () => {
             </div>
           </div>
 
-          {/* TOP META DATA */}
+          {/* META */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
               <div className="p-2 bg-indigo-50 text-indigo-600 w-fit rounded-xl">
@@ -337,7 +396,6 @@ const CreateInvoiceForm = () => {
                 )}
               />
             </div>
-
             <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
               <div className="p-2 bg-emerald-50 text-emerald-600 w-fit rounded-xl">
                 <CalendarIcon size={18} />
@@ -371,7 +429,6 @@ const CreateInvoiceForm = () => {
                 )}
               />
             </div>
-
             <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
               <div className="p-2 bg-rose-50 text-rose-600 w-fit rounded-xl">
                 <CalendarIcon size={18} />
@@ -409,7 +466,7 @@ const CreateInvoiceForm = () => {
             </div>
           </div>
 
-          {/* CLIENT SELECTION */}
+          {/* CLIENT */}
           <section className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-8 bg-indigo-600 rounded-full" />
@@ -471,7 +528,7 @@ const CreateInvoiceForm = () => {
               {fields.map((_, index) => (
                 <div
                   key={index}
-                  className="group grid grid-cols-1 md:grid-cols-12 gap-4 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm transition-all hover:border-indigo-200"
+                  className="group grid grid-cols-1 md:grid-cols-12 gap-4 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:border-indigo-200 transition-all"
                 >
                   <div className="md:col-span-5 space-y-2">
                     <label className="text-[9px] font-black uppercase text-slate-400 ml-1">
@@ -554,9 +611,9 @@ const CreateInvoiceForm = () => {
             </Button>
           </section>
 
-          {/* BOTTOM: NOTES + SUMMARY */}
+          {/* NOTES + SUMMARY */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-            <div className="md:col-span-7 space-y-6">
+            <div className="md:col-span-7">
               <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
                 <div className="flex items-center gap-3">
                   <div className="w-1.5 h-6 bg-slate-900 rounded-full" />
@@ -596,62 +653,59 @@ const CreateInvoiceForm = () => {
                 />
               </div>
             </div>
-
-            <div className="md:col-span-5 space-y-6">
+            <div className="md:col-span-5">
               <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
-                    <div className="p-2 bg-indigo-600 text-white rounded-xl">
-                      <IndianRupee size={16} />
-                    </div>
-                    <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest">
-                      Summary
-                    </h2>
+                <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
+                  <div className="p-2 bg-indigo-600 text-white rounded-xl">
+                    <IndianRupee size={16} />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      name="discountPercent"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-[9px] font-black uppercase text-slate-400">
-                            Discount (%)
-                          </FormLabel>
-                          <div className="relative">
-                            <Input
-                              type="number"
-                              {...field}
-                              className="bg-slate-50 border-none rounded-xl pl-8 font-black italic"
-                            />
-                            <Percent
-                              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                              size={12}
-                            />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      name="taxPercent"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-[9px] font-black uppercase text-slate-400">
-                            Tax (%)
-                          </FormLabel>
-                          <div className="relative">
-                            <Input
-                              type="number"
-                              {...field}
-                              className="bg-slate-50 border-none rounded-xl pl-8 font-black italic"
-                            />
-                            <Percent
-                              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                              size={12}
-                            />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest">
+                    Summary
+                  </h2>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    name="discountPercent"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[9px] font-black uppercase text-slate-400">
+                          Discount (%)
+                        </FormLabel>
+                        <div className="relative">
+                          <Input
+                            type="number"
+                            {...field}
+                            className="bg-slate-50 border-none rounded-xl pl-8 font-black italic"
+                          />
+                          <Percent
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                            size={12}
+                          />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="taxPercent"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-[9px] font-black uppercase text-slate-400">
+                          Tax (%)
+                        </FormLabel>
+                        <div className="relative">
+                          <Input
+                            type="number"
+                            {...field}
+                            className="bg-slate-50 border-none rounded-xl pl-8 font-black italic"
+                          />
+                          <Percent
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                            size={12}
+                          />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
                 </div>
                 <div className="space-y-3 pt-4">
                   <div className="flex justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest">
