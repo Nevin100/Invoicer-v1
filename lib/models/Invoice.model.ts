@@ -63,6 +63,7 @@ const invoiceSchema = new mongoose.Schema(
       bankName: { type: String },
       branchName: { type: String },
     },
+    lastPaymentId: { type: String, default: null },
   },
   { timestamps: true },
 );

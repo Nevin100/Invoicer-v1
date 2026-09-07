@@ -196,12 +196,12 @@ export default function LoginPage() {
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
                   <Lock size={12} /> Security Key
                 </label>
-                <Link
+                {/* <Link
                   href="/forgot"
                   className="text-[10px] font-black text-indigo-500 uppercase tracking-widest hover:text-indigo-700"
                 >
                   Lost Key?
-                </Link>
+                </Link> */}
               </div>
               <div className="relative">
                 <input
@@ -235,7 +235,7 @@ export default function LoginPage() {
                 <ShieldCheck size={16} />
               </div>
               <p className="text-[10px] font-bold text-slate-500 leading-tight">
-                Your data is encrypted with enterprise-grade AES-256 protocols.
+                Your data is protected and secure.
               </p>
             </div>
 

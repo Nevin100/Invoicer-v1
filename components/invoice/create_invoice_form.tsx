@@ -188,7 +188,6 @@ const CreateInvoiceForm = () => {
   const [creditRemaining, setCreditRemaining] = useState(0);
   const [savingDraft, setSavingDraft] = useState(false);
 
-  // ✅ Payment details pre-check
   const [paymentChecked, setPaymentChecked] = useState(false);
   const [hasPaymentDetails, setHasPaymentDetails] = useState(true);
 
