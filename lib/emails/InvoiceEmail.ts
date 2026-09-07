@@ -1,3 +1,14 @@
+interface PaymentDetails {
+  preferredMethod?: string;
+  upiId?: string | null;
+  upiQrUrl?: string | null;
+  accountName?: string | null;
+  accountNo?: string | null;
+  ifsc?: string | null;
+  bankName?: string | null;
+  branchName?: string | null;
+}
+
 interface InvoiceEmailProps {
   invoiceNumber: string;
   clientName: string;
@@ -8,6 +19,7 @@ interface InvoiceEmailProps {
   fromBusiness: string;
   accentColor?: string;
   items: { name: string; quantity: number; rate: number; amount: number }[];
+  paymentDetails?: PaymentDetails | null; // ✅ new
 }
 
 export function invoiceEmailHTML(props: InvoiceEmailProps): string {
@@ -15,26 +27,87 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
     invoiceNumber, clientName, totalAmount, dueDate,
     paymentLink, qrCodeBase64, fromBusiness, items,
     accentColor = "#0f0f0f",
+    paymentDetails,
   } = props;
 
   const accentAlpha = accentColor + "18";
 
   const itemRows = items.map(item => {
-    const qty = item.quantity ?? 1;
-    const rate = item.rate ?? 0;
-    const amount = item.amount ?? qty * rate; 
-
+    const qty    = item.quantity ?? 1;
+    const rate   = item.rate    ?? 0;
+    const amount = item.amount  ?? qty * rate;
     return `
     <tr>
       <td style="padding:12px 8px;border-bottom:1px solid #f0f0f0;font-size:13px;color:#1a1a1a">${item.name || "Item"}</td>
       <td style="padding:12px 8px;border-bottom:1px solid #f0f0f0;text-align:center;font-size:13px;color:#666">${qty}</td>
       <td style="padding:12px 8px;border-bottom:1px solid #f0f0f0;text-align:right;font-size:13px;color:#666">₹${rate.toLocaleString("en-IN")}</td>
       <td style="padding:12px 8px;border-bottom:1px solid #f0f0f0;text-align:right;font-size:13px;font-weight:600;color:#1a1a1a">₹${amount.toLocaleString("en-IN")}</td>
-    </tr>
-  `}).join("");
+    </tr>`;
+  }).join("");
 
-  return`
-  <!DOCTYPE html>
+  // ✅ Payment details section HTML
+  const pd = paymentDetails;
+  const showUpi  = pd && (pd.preferredMethod === "upi"  || pd.preferredMethod === "both") && pd.upiId;
+  const showBank = pd && (pd.preferredMethod === "bank" || pd.preferredMethod === "both") && pd.accountNo;
+
+  const upiSection = showUpi ? `
+    <td style="padding:20px;vertical-align:top" width="50%">
+      <div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px">Pay via UPI</div>
+      ${pd?.upiQrUrl ? `
+        <img src="${pd.upiQrUrl}" width="120" height="120" alt="UPI QR"
+          style="border:1px solid #e5e7eb;border-radius:10px;padding:8px;background:#fafafa;display:block;margin-bottom:10px"/>
+      ` : ""}
+      <div style="font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:2px">${pd?.upiId}</div>
+      <div style="font-size:11px;color:#aaa">Scan QR or pay to UPI ID</div>
+    </td>
+  ` : "";
+
+  const bankRows = showBank ? [
+    { label: "Account Name", value: pd?.accountName },
+    { label: "Account No",   value: pd?.accountNo   },
+    { label: "IFSC",         value: pd?.ifsc        },
+    { label: "Bank",         value: pd?.bankName    },
+    { label: "Branch",       value: pd?.branchName  },
+  ].filter(r => r.value).map(r => `
+    <tr>
+      <td style="padding:4px 0;font-size:11px;color:#aaa;width:110px;vertical-align:top">${r.label}</td>
+      <td style="padding:4px 0;font-size:12px;font-weight:700;color:#1a1a1a">${r.value}</td>
+    </tr>
+  `).join("") : "";
+
+  const bankSection = showBank ? `
+    <td style="padding:20px;vertical-align:top;border-left:1px solid #f0f0f0" width="50%">
+      <div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px">Bank Transfer</div>
+      <table cellpadding="0" cellspacing="0">${bankRows}</table>
+    </td>
+  ` : "";
+
+  const paymentDetailsSection = (showUpi || showBank) ? `
+    <!-- PAYMENT DETAILS -->
+    <tr>
+      <td style="padding:0 48px 8px">
+        <div style="height:1px;background:#f0f0f0"></div>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:0 48px 32px">
+        <div style="background:#fafafa;border:1px solid #f0f0f0;border-radius:12px;overflow:hidden">
+          <div style="background:${accentAlpha};padding:10px 20px;font-size:10px;font-weight:700;color:${accentColor};text-transform:uppercase;letter-spacing:1.5px">
+            Payment Details
+          </div>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              ${upiSection}
+              ${bankSection}
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+  ` : "";
+
+  return `
+<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
 <body style="margin:0;padding:0;background:#f0f0f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
@@ -94,7 +167,6 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
         <tr>
           <td style="padding:32px 48px">
 
-            <!-- Greeting -->
             <p style="font-size:15px;color:#333;margin:0 0 24px">
               Hi <strong style="color:#0f0f0f">${clientName}</strong>, please find your invoice details below.
             </p>
@@ -136,17 +208,11 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
               </a>
             </div>
 
-            <!-- QR Code -->
-            <div style="text-align:center;margin:0 0 8px">
-              <p style="color:#aaa;font-size:12px;margin:0 0 14px;font-weight:500">Or scan to pay</p>
-              <img src="${qrCodeBase64}" width="140" height="140" alt="Payment QR"
-                style="border:2px solid ${accentColor}22;border-radius:12px;padding:10px;background:#fafafa"/>
-            </div>
-
           </td>
         </tr>
-
-        <!-- BOTTOM ACCENT BAR + FOOTER -->
+        <!-- ✅ USER PAYMENT DETAILS SECTION -->
+        ${paymentDetailsSection}
+        <!-- FOOTER -->
         <tr>
           <td style="background:${accentAlpha};padding:20px 48px;border-top:1px solid ${accentColor}22">
             <p style="color:#aaa;font-size:11px;margin:0;text-align:center;font-weight:500">
@@ -154,10 +220,9 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
             </p>
           </td>
         </tr>
-
       </table>
     </td></tr>
   </table>
 </body>
-</html>`
+</html>`;
 }

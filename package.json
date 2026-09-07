@@ -41,7 +41,6 @@
     "mongodb": "^6.15.0",
     "mongoose": "^8.13.1",
     "next": "latest",
-    "nodemailer": "^8.0.5",
     "nprogress": "^0.2.0",
     "pdfkit": "^0.17.2",
     "qrcode": "^1.5.4",
