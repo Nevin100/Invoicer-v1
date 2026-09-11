@@ -37,6 +37,12 @@ const InvoicePage = () => {
     dueDate: string;
   };
 
+  const handleMarkPaid = (invoiceId: string) => {
+  setInvoices(prev => prev.map(inv =>
+    inv.id === invoiceId ? { ...inv, status: "Paid" } : inv
+  ));
+};
+
   const exportToCSV = (data: Invoice[]) => {
     const headers = ["Name", "Email", "Invoice No.", "Description", "Status", "Amount", "Date", "Due Date"];
     const rows = data.map((inv) =>
@@ -247,6 +253,7 @@ const InvoicePage = () => {
               selectedInvoices={selectedInvoices}
               handleCheckboxChange={handleCheckboxChange}
               onViewDetails={(inv) => setSelectedInvoice(inv)}
+              onMarkPaid={handleMarkPaid}
             />
           </Suspense>
         )}

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
-import { Eye, FileText, Calendar, User, MoreHorizontal } from "lucide-react";
+import React, { useState } from "react";
+import { Eye, FileText, Calendar, User, CheckCircle, Loader2 } from "lucide-react";
+import Swal from "sweetalert2";
 
 type Invoice = {
   id: string;
@@ -21,6 +22,7 @@ interface InvoiceTableProps {
   selectedInvoices: string[];
   handleCheckboxChange: (id: string) => void;
   onViewDetails: (invoice: Invoice) => void;
+  onMarkPaid?: (invoiceId: string) => void; // ✅ callback to update parent state
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({
@@ -28,23 +30,61 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   selectedInvoices,
   handleCheckboxChange,
   onViewDetails,
+  onMarkPaid,
 }) => {
-  
-  // Status Badge Logic
+  const [markingPaid, setMarkingPaid] = useState<string | null>(null);
+
   const getStatusStyles = (status: string) => {
     switch (status.toLowerCase()) {
-      case "paid":
-        return "bg-emerald-50 text-emerald-600 border-emerald-100";
-      case "overdue":
-        return "bg-rose-50 text-rose-600 border-rose-100";
-      case "sent":
-        return "bg-indigo-50 text-indigo-600 border-indigo-100";
-      default:
-        return "bg-slate-50 text-slate-600 border-slate-100";
+      case "paid":    return "bg-emerald-50 text-emerald-600 border-emerald-100";
+      case "overdue": return "bg-rose-50 text-rose-600 border-rose-100";
+      case "sent":    return "bg-indigo-50 text-indigo-600 border-indigo-100";
+      default:        return "bg-slate-50 text-slate-600 border-slate-100";
     }
   };
 
-  /* EMPTY STATE */
+  // ✅ Mark as Paid handler
+  const handleMarkPaid = async (invoice: Invoice) => {
+    const { isConfirmed } = await Swal.fire({
+      title: "Mark as Paid?",
+      text:  `Confirm payment received for Invoice #${invoice.invoiceNo} — ₹${invoice.amount.toLocaleString()}`,
+      icon:  "question",
+      showCancelButton:    true,
+      confirmButtonColor:  "#059669",
+      cancelButtonColor:   "#e2e8f0",
+      confirmButtonText:   "Yes, Mark Paid",
+      cancelButtonText:    "Cancel",
+    });
+
+    if (!isConfirmed) return;
+
+    setMarkingPaid(invoice.id);
+    try {
+      const res = await fetch(`/api/invoices/${invoice.id}`, {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ status: "Paid", paidAt: new Date() }),
+      });
+
+      if (!res.ok) throw new Error("Failed");
+
+      Swal.fire({
+        title: "Marked as Paid!",
+        icon:  "success",
+        timer: 1500,
+        showConfirmButton: false,
+        confirmButtonColor: "#059669",
+      });
+
+      onMarkPaid?.(invoice.id); // update parent
+    } catch {
+      Swal.fire("Error", "Could not update invoice. Try again.", "error");
+    } finally {
+      setMarkingPaid(null);
+    }
+  };
+
   if (invoices.length === 0) {
     return (
       <div className="w-full flex flex-col items-center justify-center py-32 text-center bg-white rounded-[2.5rem]">
@@ -61,13 +101,11 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
 
   return (
     <div className="w-full font-['Archivo']">
-      {/* ================= MOBILE VIEW ================= */}
+
+      {/* ── MOBILE ── */}
       <div className="space-y-4 sm:hidden p-4">
         {invoices.map((invoice) => (
-          <div
-            key={invoice.invoiceNo}
-            className="border border-slate-100 rounded-[2rem] p-6 bg-white shadow-sm hover:shadow-md transition-all"
-          >
+          <div key={invoice.invoiceNo} className="border border-slate-100 rounded-[2rem] p-6 bg-white shadow-sm hover:shadow-md transition-all">
             <div className="flex justify-between items-start mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center text-white font-black text-xs uppercase">
@@ -78,38 +116,43 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   <p className="text-[10px] font-bold text-slate-400 tracking-tight">{invoice.invoiceNo}</p>
                 </div>
               </div>
-              <input
-                type="checkbox"
-                checked={selectedInvoices.includes(invoice.invoiceNo)}
-                onChange={() => handleCheckboxChange(invoice.invoiceNo)}
-                className="w-5 h-5 rounded-lg border-slate-200 text-indigo-600 accent-indigo-600"
-              />
+              <input type="checkbox" checked={selectedInvoices.includes(invoice.invoiceNo)} onChange={() => handleCheckboxChange(invoice.invoiceNo)}
+                className="w-5 h-5 rounded-lg border-slate-200 text-indigo-600 accent-indigo-600" />
             </div>
 
             <div className="grid grid-cols-2 gap-4 py-4 border-y border-slate-50">
-               <div>
-                  <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Amount</p>
-                  <p className="text-sm font-black text-slate-900 mt-0.5 italic">₹{invoice.amount.toLocaleString()}</p>
-               </div>
-               <div className="text-right">
-                  <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Status</p>
-                  <span className={`inline-block mt-1 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter border ${getStatusStyles(invoice.status)}`}>
-                    {invoice.status}
-                  </span>
-               </div>
+              <div>
+                <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Amount</p>
+                <p className="text-sm font-black text-slate-900 mt-0.5 italic">₹{invoice.amount.toLocaleString()}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Status</p>
+                <span className={`inline-block mt-1 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter border ${getStatusStyles(invoice.status)}`}>
+                  {invoice.status}
+                </span>
+              </div>
             </div>
 
-            <button
-              onClick={() => onViewDetails(invoice)}
-              className="w-full mt-4 py-3 bg-slate-50 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 flex items-center justify-center gap-2 hover:bg-indigo-600 hover:text-white transition-all"
-            >
-              <Eye size={14} /> View Details
-            </button>
+            <div className="flex gap-2 mt-4">
+              <button onClick={() => onViewDetails(invoice)}
+                className="flex-1 py-3 bg-slate-50 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 flex items-center justify-center gap-2 hover:bg-slate-900 hover:text-white transition-all">
+                <Eye size={14} /> View
+              </button>
+              {invoice.status !== "Paid" && (
+                <button onClick={() => handleMarkPaid(invoice)} disabled={markingPaid === invoice.id}
+                  className="flex-1 py-3 bg-emerald-50 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 flex items-center justify-center gap-2 hover:bg-emerald-600 hover:text-white transition-all disabled:opacity-50">
+                  {markingPaid === invoice.id
+                    ? <Loader2 size={14} className="animate-spin" />
+                    : <><CheckCircle size={14} /> Paid</>
+                  }
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* ================= DESKTOP VIEW ================= */}
+      {/* ── DESKTOP ── */}
       <div className="hidden sm:block overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
@@ -125,17 +168,10 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
           </thead>
           <tbody className="divide-y divide-slate-50">
             {invoices.map((invoice) => (
-              <tr
-                key={invoice.invoiceNo}
-                className="group hover:bg-indigo-50/20 transition-all duration-200"
-              >
+              <tr key={invoice.invoiceNo} className="group hover:bg-indigo-50/20 transition-all duration-200">
                 <td className="py-5 px-6">
-                  <input
-                    type="checkbox"
-                    checked={selectedInvoices.includes(invoice.invoiceNo)}
-                    onChange={() => handleCheckboxChange(invoice.invoiceNo)}
-                    className="w-5 h-5 rounded-lg border-slate-200 text-indigo-600 accent-indigo-600"
-                  />
+                  <input type="checkbox" checked={selectedInvoices.includes(invoice.invoiceNo)} onChange={() => handleCheckboxChange(invoice.invoiceNo)}
+                    className="w-5 h-5 rounded-lg border-slate-200 text-indigo-600 accent-indigo-600" />
                 </td>
 
                 <td className="py-5 px-6">
@@ -172,13 +208,24 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   </div>
                 </td>
 
+                {/* ✅ Actions */}
                 <td className="py-5 px-6 text-right">
-                  <button
-                    onClick={() => onViewDetails(invoice)}
-                    className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-900 hover:text-white transition-all shadow-sm"
-                  >
-                    <Eye size={16} />
-                  </button>
+                  <div className="flex items-center justify-end gap-2">
+                    {/* Mark as Paid — sirf Sent/Draft/Overdue pe dikhega */}
+                    {invoice.status !== "Paid" && (
+                      <button onClick={() => handleMarkPaid(invoice)} disabled={markingPaid === invoice.id}
+                        className="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all disabled:opacity-50 border border-emerald-100">
+                        {markingPaid === invoice.id
+                          ? <Loader2 size={13} className="animate-spin" />
+                          : <><CheckCircle size={13} /> Mark Paid</>
+                        }
+                      </button>
+                    )}
+                    <button onClick={() => onViewDetails(invoice)}
+                      className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-900 hover:text-white transition-all shadow-sm">
+                      <Eye size={16} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -14,18 +14,16 @@ interface InvoiceEmailProps {
   clientName: string;
   totalAmount: number;
   dueDate: string;
-  paymentLink: string;
-  qrCodeBase64: string;
   fromBusiness: string;
   accentColor?: string;
   items: { name: string; quantity: number; rate: number; amount: number }[];
-  paymentDetails?: PaymentDetails | null; // ✅ new
+  paymentDetails?: PaymentDetails | null;
 }
 
 export function invoiceEmailHTML(props: InvoiceEmailProps): string {
   const {
     invoiceNumber, clientName, totalAmount, dueDate,
-    paymentLink, qrCodeBase64, fromBusiness, items,
+    fromBusiness, items,
     accentColor = "#0f0f0f",
     paymentDetails,
   } = props;
@@ -45,7 +43,6 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
     </tr>`;
   }).join("");
 
-  // ✅ Payment details section HTML
   const pd = paymentDetails;
   const showUpi  = pd && (pd.preferredMethod === "upi"  || pd.preferredMethod === "both") && pd.upiId;
   const showBank = pd && (pd.preferredMethod === "bank" || pd.preferredMethod === "both") && pd.accountNo;
@@ -83,7 +80,6 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
   ` : "";
 
   const paymentDetailsSection = (showUpi || showBank) ? `
-    <!-- PAYMENT DETAILS -->
     <tr>
       <td style="padding:0 48px 8px">
         <div style="height:1px;background:#f0f0f0"></div>
@@ -93,7 +89,7 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
       <td style="padding:0 48px 32px">
         <div style="background:#fafafa;border:1px solid #f0f0f0;border-radius:12px;overflow:hidden">
           <div style="background:${accentAlpha};padding:10px 20px;font-size:10px;font-weight:700;color:${accentColor};text-transform:uppercase;letter-spacing:1.5px">
-            Payment Details
+            How to Pay
           </div>
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
@@ -115,10 +111,7 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
     <tr><td align="center">
       <table width="580" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">
 
-        <!-- TOP ACCENT BAR -->
-        <tr>
-          <td style="background:${accentColor};height:4px;font-size:0;line-height:0">&nbsp;</td>
-        </tr>
+        <tr><td style="background:${accentColor};height:4px;font-size:0;line-height:0">&nbsp;</td></tr>
 
         <!-- HEADER -->
         <tr>
@@ -139,12 +132,11 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
           </td>
         </tr>
 
-        <!-- DIVIDER -->
         <tr><td style="padding:0 48px"><div style="height:1px;background:#f0f0f0"></div></td></tr>
 
-        <!-- META ROW -->
+        <!-- META -->
         <tr>
-          <td style="padding:0">
+          <td>
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr>
                 <td style="padding:20px 48px;border-right:1px solid #f0f0f0" width="50%">
@@ -160,18 +152,16 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
           </td>
         </tr>
 
-        <!-- DIVIDER -->
         <tr><td style="padding:0 48px"><div style="height:1px;background:#f0f0f0"></div></td></tr>
 
         <!-- BODY -->
         <tr>
           <td style="padding:32px 48px">
-
             <p style="font-size:15px;color:#333;margin:0 0 24px">
               Hi <strong style="color:#0f0f0f">${clientName}</strong>, please find your invoice details below.
             </p>
 
-            <!-- Items Table -->
+            <!-- Items -->
             <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:24px">
               <thead>
                 <tr style="background:${accentAlpha}">
@@ -184,7 +174,7 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
               <tbody>${itemRows}</tbody>
             </table>
 
-            <!-- Total box -->
+            <!-- Total -->
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr>
                 <td align="right">
@@ -199,19 +189,12 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
                 </td>
               </tr>
             </table>
-
-            <!-- Pay Now Button -->
-            <div style="text-align:center;margin:36px 0 28px">
-              <a href="${paymentLink}"
-                style="background:${accentColor};color:#ffffff;padding:16px 48px;border-radius:10px;text-decoration:none;font-size:15px;font-weight:700;display:inline-block;letter-spacing:0.3px">
-                Pay Now ₹${totalAmount.toLocaleString("en-IN")}
-              </a>
-            </div>
-
           </td>
         </tr>
-        <!-- ✅ USER PAYMENT DETAILS SECTION -->
+
+        <!-- HOW TO PAY -->
         ${paymentDetailsSection}
+
         <!-- FOOTER -->
         <tr>
           <td style="background:${accentAlpha};padding:20px 48px;border-top:1px solid ${accentColor}22">
@@ -220,6 +203,7 @@ export function invoiceEmailHTML(props: InvoiceEmailProps): string {
             </p>
           </td>
         </tr>
+
       </table>
     </td></tr>
   </table>
