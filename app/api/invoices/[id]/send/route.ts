@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/database/db_connection";
 import Invoice from "@/lib/models/Invoice.model";
 import { getUserId } from "@/lib/helpers/getUserId";
-import { createPaymentLink } from "@/lib/razorpay/razorpay";
 import { invoiceEmailHTML } from "@/lib/emails/InvoiceEmail";
 import { cache } from "@/lib/Redis/cache";
 import { CacheKeys } from "@/lib/Redis/cacheKeys";
@@ -25,42 +24,27 @@ export async function POST(
     await connectDB();
     const userId = await getUserId();
 
-    if (!userId) {
+    if (!userId)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
     const rl = await withRateLimit(req, userId, "sensitive");
     if (rl) return rl;
 
     const invoice = await Invoice.findOne({ _id: id, user: userId }).populate(
-      "client",
-      "clientName email phone address",
+      "client", "clientName email phone address",
     );
 
-    if (!invoice) {
+    if (!invoice)
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
-    }
 
-    if (!invoice.client?.email) {
+    if (!invoice.client?.email)
       return NextResponse.json({ error: "Client has no email address" }, { status: 400 });
-    }
 
     const body = await req.json().catch(() => ({}));
     const businessName  = body.businessName  || "Your Business";
     const businessEmail = body.businessEmail || process.env.RESEND_FROM_EMAIL || "";
 
-    const paymentLink = await createPaymentLink({
-      _id:           invoice._id.toString(),
-      invoiceNumber: invoice.invoiceNumber,
-      totalAmount:   invoice.totalAmount,
-      clientEmail:   invoice.client.email,
-      clientName:    invoice.client.clientName,
-      description:   invoice.description,
-    });
-
-    const encodedLink  = encodeURIComponent(paymentLink);
-    const razorpayQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodedLink}&margin=10`;
-
+    // ✅ No Razorpay — user ke payment details se UPI QR banao
     const pd = invoice.paymentDetails;
 
     let upiQrUrl: string | null = null;
@@ -78,8 +62,6 @@ export async function POST(
       dueDate:       new Date(invoice.dueDate).toLocaleDateString("en-IN", {
         day: "2-digit", month: "short", year: "numeric",
       }),
-      paymentLink,
-      qrCodeBase64:  razorpayQrUrl,
       fromBusiness:  businessName,
       accentColor:   invoice.accentColor || "#0f0f0f",
       items: invoice.items.map((item: any) => ({
@@ -88,16 +70,15 @@ export async function POST(
         rate:     item.rate     ?? 0,
         amount:   item.amount   ?? (item.quantity ?? 1) * (item.rate ?? 0),
       })),
-
       paymentDetails: pd ? {
         preferredMethod: pd.preferredMethod,
-        upiId:           pd.upiId        || null,
-        upiQrUrl:        upiQrUrl        || null,
-        accountName:     pd.accountName  || null,
-        accountNo:       pd.accountNo    || null,
-        ifsc:            pd.ifsc         || null,
-        bankName:        pd.bankName     || null,
-        branchName:      pd.branchName   || null,
+        upiId:           pd.upiId       || null,
+        upiQrUrl:        upiQrUrl       || null,
+        accountName:     pd.accountName || null,
+        accountNo:       pd.accountNo   || null,
+        ifsc:            pd.ifsc        || null,
+        bankName:        pd.bankName    || null,
+        branchName:      pd.branchName  || null,
       } : null,
     });
 
@@ -113,10 +94,10 @@ export async function POST(
       return NextResponse.json({ error: "Email delivery failed" }, { status: 500 });
     }
 
+    // ✅ Status Sent — no paymentLink
     await Invoice.findByIdAndUpdate(id, {
-      status:      "Sent",
-      paymentLink,
-      sentAt:      new Date(),
+      status: "Sent",
+      sentAt: new Date(),
     });
 
     await Promise.all([
@@ -126,7 +107,7 @@ export async function POST(
     ]);
 
     logger.info("Invoice sent successfully", { invoiceId: id, userId, to: invoice.client.email });
-    return NextResponse.json({ success: true, paymentLink });
+    return NextResponse.json({ success: true });
 
   } catch (error) {
     logger.error("Invoice send failed", {
